@@ -11,6 +11,6 @@ namespace Tools
         public string Name { get; }
         public string Description { get; }
 
-        public abstract void HandleOperation(object value);
+        public abstract void HandleOperation(object? value);
     }
 }
