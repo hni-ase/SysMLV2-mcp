@@ -1,56 +1,72 @@
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Org.OpenAPITools.Api;
+using Org.OpenAPITools.Model;
+using Org.OpenAPITools.Extensions;
 
 namespace Src.Services
 {
     public interface ISysMLApiService
     {
-        Task<string> GetModelAsync(string modelId);
-        Task<string> CreateModelAsync(string modelData);
-        Task<string> UpdateModelAsync(string modelId, string modelData);
-        Task<bool> DeleteModelAsync(string modelId);
+
     }
 
     public class SysMLApiService : ISysMLApiService
     {
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<SysMLApiService> _logger;
-        private const string BaseUrl = "https://sysmlv2-api.example.com/api/models";
+        private const string BaseUrl = "http://localhost:9000"; // Example base URL
+        private readonly IHost _host;
 
-        public SysMLApiService(HttpClient httpClient, ILogger<SysMLApiService> logger)
+        public SysMLApiService(IHost httpHost)
         {
-            _httpClient = httpClient;
-            _logger = logger;
+            _host = httpHost;
         }
 
-        public async Task<string> GetModelAsync(string modelId)
+        public async Task<object> CreateModelAsync(object modelData)
         {
-            var response = await _httpClient.GetAsync($"{BaseUrl}/{modelId}");
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+            var apiInstance = _host.Services.GetRequiredService<IProjectApi>();
+            Guid projectGuid = new();
+            Guid branchGuid = new();
+            var response = await apiInstance.PostProjectOrDefaultAsync(
+                new Project(projectGuid,
+                Project.TypeEnum.Project, new ProjectDefaultBranch(branchGuid), "This is a model description", "modelName"));
+
+            // Now we need to add the model data to the project we just creatd
+            return response;
         }
 
-        public async Task<string> CreateModelAsync(string modelData)
+        public Task<object> GetModelAsync(string modelId)
         {
-            var content = new StringContent(modelData, System.Text.Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(BaseUrl, content);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+            throw new NotImplementedException();
         }
 
-        public async Task<string> UpdateModelAsync(string modelId, string modelData)
+        public Task<object> UpdateModelAsync(string modelId, object modelData)
         {
-            var content = new StringContent(modelData, System.Text.Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync($"{BaseUrl}/{modelId}", content);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+            throw new NotImplementedException();
         }
 
-        public async Task<bool> DeleteModelAsync(string modelId)
+        public Task<bool> DeleteModelAsync(string modelId)
         {
-            var response = await _httpClient.DeleteAsync($"{BaseUrl}/{modelId}");
-            return response.IsSuccessStatusCode;
+            throw new NotImplementedException();
         }
+
+        private static IHostBuilder CreateHostBuilder(string[] args) => Host.CreateDefaultBuilder(args)
+              .ConfigureApi((context, services, options) =>
+              {
+                  options.ConfigureJsonOptions((jsonOptions) =>
+                  {
+                      // your custom converters if any
+                  });
+
+                  options.AddApiHttpClients(client =>
+                  {
+                      // client configuration
+                  }, builder =>
+                  {
+                      builder
+                          .AddRetryPolicy(2)
+                          .AddTimeoutPolicy(TimeSpan.FromSeconds(5))
+                          .AddCircuitBreakerPolicy(10, TimeSpan.FromSeconds(30));
+                      // add whatever middleware you prefer
+                  }
+                  );
+              });
     }
 }
