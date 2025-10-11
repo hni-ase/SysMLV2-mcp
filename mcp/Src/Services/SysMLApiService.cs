@@ -1,72 +1,80 @@
 using Org.OpenAPITools.Api;
+using Org.OpenAPITools.Client;
 using Org.OpenAPITools.Model;
-using Org.OpenAPITools.Extensions;
+using Src.Services;
 
-namespace Src.Services
+namespace mcp.Src.Services
 {
-    public interface ISysMLApiService
-    {
-
-    }
 
     public class SysMLApiService : ISysMLApiService
     {
         private const string BaseUrl = "http://localhost:9000"; // Example base URL
         private readonly IHost _host;
+        private readonly HttpClient _httpClient;
+
+        private readonly IProjectApi _projectApi;
 
         public SysMLApiService(IHost httpHost)
         {
             _host = httpHost;
+            _httpClient = _host.Services.GetRequiredService<IHttpClientFactory>().CreateClient("SysMLV2-Database-Client");
+            // Create the services we need MANUALLY and not via DI
+            ILoggerFactory loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
+            JsonSerializerOptionsProvider jsonSerializerOptionsProvider = new(null);
+
+            _projectApi = new ProjectApi(loggerFactory.CreateLogger<ProjectApi>(),
+                loggerFactory,
+                _httpClient,
+                jsonSerializerOptionsProvider, 
+                new ProjectApiEvents());
         }
 
-        public async Task<object> CreateModelAsync(object modelData)
+        public async Task<Guid> CreateNewProjectAsync(string projectName, string projectDescription)
         {
-            var apiInstance = _host.Services.GetRequiredService<IProjectApi>();
+
             Guid projectGuid = new();
             Guid branchGuid = new();
-            var response = await apiInstance.PostProjectOrDefaultAsync(
-                new Project(projectGuid,
-                Project.TypeEnum.Project, new ProjectDefaultBranch(branchGuid), "This is a model description", "modelName"));
+            var response = await _projectApi.PostProjectOrDefaultAsync(
+                new Org.OpenAPITools.Model.Project(projectGuid,
+                Org.OpenAPITools.Model.Project.TypeEnum.Project, new Org.OpenAPITools.Model.ProjectDefaultBranch(branchGuid), projectDescription, projectName));
 
-            // Now we need to add the model data to the project we just creatd
-            return response;
+            if (response != null && response.TryCreated(out var project))
+            {
+                var newProjectId = project.Id;
+                return (Guid)newProjectId;
+            }
+            else
+            {
+                throw new Exception("Failed to create project");
+            }
         }
 
-        public Task<object> GetModelAsync(string modelId)
+        public async Task<Guid> CreateNewBranchAsync(Guid projectId, string branchName)
         {
-            throw new NotImplementedException();
+            var apiInstance = _host.Services.GetRequiredService<IBranchApi>();
+            Guid branchGuid = new();
+            var response = await apiInstance.PostBranchByProjectOrDefaultAsync(projectId,
+                new Org.OpenAPITools.Model.Branch(branchGuid, null, null, null));
+
+            return new Guid();
         }
 
-        public Task<object> UpdateModelAsync(string modelId, object modelData)
+        public async Task<List<CommitInformation>> GetCommits(Guid projectId, Guid branchId)
         {
-            throw new NotImplementedException();
+            var apiInstance = _host.Services.GetRequiredService<ICommitApi>();
+            var response = await apiInstance.GetCommitsByProjectAsync(projectId);
+            // Map to CommitInformation if needed
+            // return response.Select(c => new CommitInformation()).ToList();
+            return new List<CommitInformation>();
         }
 
-        public Task<bool> DeleteModelAsync(string modelId)
+        public async Task<Guid> CommitElementToBranchAsync(Guid projectId, Guid branchId, Org.OpenAPITools.Model.Commit commit)
         {
-            throw new NotImplementedException();
+            var apiInstance = _host.Services.GetRequiredService<ICommitApi>();
+            // var response = await apiInstance.PostCommitOrDefaultAsync(projectId, branchId, commit);
+            // return response.Id;
+            return new Guid();
         }
-
-        private static IHostBuilder CreateHostBuilder(string[] args) => Host.CreateDefaultBuilder(args)
-              .ConfigureApi((context, services, options) =>
-              {
-                  options.ConfigureJsonOptions((jsonOptions) =>
-                  {
-                      // your custom converters if any
-                  });
-
-                  options.AddApiHttpClients(client =>
-                  {
-                      // client configuration
-                  }, builder =>
-                  {
-                      builder
-                          .AddRetryPolicy(2)
-                          .AddTimeoutPolicy(TimeSpan.FromSeconds(5))
-                          .AddCircuitBreakerPolicy(10, TimeSpan.FromSeconds(30));
-                      // add whatever middleware you prefer
-                  }
-                  );
-              });
     }
+
 }
