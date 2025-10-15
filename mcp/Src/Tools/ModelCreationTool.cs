@@ -50,4 +50,18 @@ public class ModelCreationTools
         // return string.Format("Element '{0}' created successfully.", elementName);
     }
 
+    [McpServerTool, Description("Creates a new use case in the specified project.")]
+    public static UseCaseLLMInformation CreateUseCase(string name, string documentation, string precondition)
+    {
+        throw new NotImplementedException();
+        // return string.Format("Element '{0}' created successfully.", elementName);
+    }
+
+    [McpServerTool, Description("Creates a new actor in the specified project.")]
+    public static string CreateActor(string name, string documentation)
+    {
+        throw new NotImplementedException();
+        // return string.Format("Element '{0}' created successfully.", elementName);
+    }
+
 }
