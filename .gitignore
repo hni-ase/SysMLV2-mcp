@@ -3,9 +3,6 @@ bin/
 obj/
 out/
 
-# SysML V2 Client should be generated
-sysml-v2-client/
-
 # User-specific files
 *.user
 *.suo
