@@ -36,7 +36,7 @@ public class ModelCreationToolTests
     {
         // Arrange
         var projectName = "TestProject";
-        var expectedProjectId = Guid.NewGuid();
+        var expectedProjectId = string.Empty;
         
         _mockSysMLService.Setup(s => s.CreateNewProjectAsync(
                 It.Is<string>(name => name == projectName),
