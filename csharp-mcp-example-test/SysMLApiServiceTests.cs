@@ -114,12 +114,12 @@ public class MockSysMLApiServiceTests
 {
     private class MockSysMLApiService : ISysMLApiService
     {
-        public Task<Guid> CreateNewProjectAsync(string projectName, string projectDescription)
+        public Task<string> CreateNewProjectAsync(string projectName, string projectDescription)
         {
             if (string.IsNullOrEmpty(projectName))
                 throw new ArgumentException("Project name cannot be null or empty", nameof(projectName));
             
-            return Task.FromResult(Guid.NewGuid());
+            return Task.FromResult(Guid.NewGuid().ToString());
         }
 
         public Task<Guid> CreateNewBranchAsync(Guid projectId, string branchName)
@@ -180,7 +180,7 @@ public class MockSysMLApiServiceTests
         var result = await _service.CreateNewProjectAsync("TestProject", "Test Description");
 
         // Assert
-        Assert.NotEqual(Guid.Empty, result);
+        Assert.NotEqual(Guid.Empty.ToString(), result);
     }
 
     [Fact]

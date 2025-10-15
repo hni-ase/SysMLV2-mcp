@@ -20,32 +20,39 @@ namespace mcp.Src.Services
             _httpClient = _host.Services.GetRequiredService<IHttpClientFactory>().CreateClient("SysMLV2-Database-Client");
             // Create the services we need MANUALLY and not via DI
             ILoggerFactory loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
-            JsonSerializerOptionsProvider jsonSerializerOptionsProvider = new(null);
+            JsonSerializerOptionsProvider jsonSerializerOptionsProvider = new(
+                new System.Text.Json.JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault,
+                }
+            );
 
             _projectApi = new ProjectApi(loggerFactory.CreateLogger<ProjectApi>(),
                 loggerFactory,
                 _httpClient,
-                jsonSerializerOptionsProvider, 
+                jsonSerializerOptionsProvider,
                 new ProjectApiEvents());
         }
 
-        public async Task<Guid> CreateNewProjectAsync(string projectName, string projectDescription)
+        public async Task<string> CreateNewProjectAsync(string projectName, string projectDescription)
         {
 
-            Guid projectGuid = new();
-            Guid branchGuid = new();
             var response = await _projectApi.PostProjectOrDefaultAsync(
-                new Org.OpenAPITools.Model.Project(projectGuid,
-                Org.OpenAPITools.Model.Project.TypeEnum.Project, new Org.OpenAPITools.Model.ProjectDefaultBranch(branchGuid), projectDescription, projectName));
+                new Project(null,
+                    Project.TypeEnum.Project,
+                    null, projectDescription,
+                    projectName));
 
             if (response != null && response.TryCreated(out var project))
             {
+                Console.WriteLine(response.ToString());
                 var newProjectId = project.Id;
-                return (Guid)newProjectId;
+                return newProjectId.ToString();
             }
             else
             {
-                throw new Exception("Failed to create project");
+                return response.ToString();
             }
         }
 

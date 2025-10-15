@@ -6,7 +6,7 @@ namespace Src.Services
 {
     public interface ISysMLApiService
     {
-        Task<Guid> CreateNewProjectAsync(string projectName, string projectDescription);
+        Task<string> CreateNewProjectAsync(string projectName, string projectDescription);
         Task<Guid> CreateNewBranchAsync(Guid projectId, string branchName);
 
         Task<List<CommitInformation>> GetCommits(Guid projectId, Guid branchId);
