@@ -1,17 +1,11 @@
-using System.Text.Json;
 using mcp.Src.Services;
-using Org.OpenAPITools.Api;
-using Org.OpenAPITools.Client;
-using Org.OpenAPITools.Model;
 using Src.Services;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Logging.
-    AddOpenTelemetry().
     AddConsole(consoleLogOptions =>
     {
-        // Configure all logs to go to stderr
-        consoleLogOptions.LogToStandardErrorThreshold = LogLevel.Trace;
+        consoleLogOptions.LogToStandardErrorThreshold = LogLevel.Error;
     });
 builder.Services
     .AddMcpServer()
@@ -28,14 +22,6 @@ builder.Services.AddHttpClient(
         // Add a user-agent default request header.
         client.DefaultRequestHeaders.UserAgent.ParseAdd("dotnet-docs");
     });
-// builder.Services.AddHttpClient<ProjectApi>((client) =>
-// {
-//     client.BaseAddress = new Uri("http://localhost:9000");
-// });
-
-// builder.Services.AddScoped<JsonSerializerOptionsProvider>();
-// builder.Services.AddScoped<JsonSerializerOptions>();
-
 builder.Services.AddSingleton<ISysMLApiService, SysMLApiService>();
 
 
