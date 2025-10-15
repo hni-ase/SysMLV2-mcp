@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/dotnet-mssql
 {
-	"name": ".NET (C#), Node.js (TypeScript) & MS SQL",
+	"name": ".NET (C#), Node.js (TypeScript) & PostgreSQL & Java Server",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
@@ -15,38 +15,30 @@
 		"vscode": {
 			// Set *default* container specific settings.json values on container create.
 			"settings": {
-				"mssql.connections": [
-					{
-						"server": "localhost,1433",
-						"database": "",
-						"authenticationType": "SqlLogin",
-						"user": "sa",
-						"password": "P@ssw0rd",
-						"emptyPasswordInput": false,
-						"savePassword": false,
-						"profileName": "mssql-container"
-					}
-				]
 			},
-
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				"ms-dotnettools.csharp",
-				"ms-mssql.mssql"
+				"ms-vscode.vscode-json"
 			]
 		}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [5000, 5001],
-	// "portsAttributes": {
-	//		"5001": {
-	//			"protocol": "https"
-	//		}
-	// }
+	"forwardPorts": [
+		5000,
+		5001,
+		8080,
+		8443
+	],
+	"portsAttributes": {
+		"5001": {
+			"protocol": "https"
+		}
+	},
 
-	// postCreateCommand.sh parameters: $1=SA password, $2=dacpac path, $3=sql script(s) path
-	"postCreateCommand": "bash .devcontainer/mssql/postCreateCommand.sh 'P@ssw0rd' './bin/Debug/' './.devcontainer/mssql/'",
+	// Remove the MSSQL-specific postCreateCommand
+	// "postCreateCommand": "bash .devcontainer/mssql/postCreateCommand.sh 'P@ssw0rd' './bin/Debug/' './.devcontainer/mssql/'",
 	"features": {
 		"ghcr.io/nikiforovall/devcontainer-features/dotnet-csharpier:1": {},
 		"ghcr.io/dotnet/aspire-devcontainer-feature/dotnetaspire:1": {}
