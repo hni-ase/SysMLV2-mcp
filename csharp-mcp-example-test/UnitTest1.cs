@@ -6,6 +6,7 @@ using Src.Services;
 using System;
 using Xunit;
 using System.Threading.Tasks;
+using Org.OpenAPITools.Model;
 
 namespace csharp_mcp_example_test;
 
@@ -149,7 +150,7 @@ public class SysMLApiServiceTests
         // Verify return types
         Assert.Equal(typeof(Task<Guid>), createProjectMethod.ReturnType);
         Assert.Equal(typeof(Task<Guid>), createBranchMethod.ReturnType);
-        Assert.Equal(typeof(Task<List<CommitInformation>>), getCommitsMethod.ReturnType);
+        Assert.Equal(typeof(Task<List<Commit>>), getCommitsMethod.ReturnType);
         Assert.Equal(typeof(Task<Guid>), commitElementMethod.ReturnType);
     }
 }

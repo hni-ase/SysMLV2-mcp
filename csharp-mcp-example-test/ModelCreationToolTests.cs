@@ -7,6 +7,8 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 using ModelContextProtocol.Server;
+using System.Runtime.CompilerServices;
+using Org.OpenAPITools.Model;
 
 namespace csharp_mcp_example_test;
 
@@ -36,7 +38,7 @@ public class ModelCreationToolTests
     {
         // Arrange
         var projectName = "TestProject";
-        var expectedProjectId = string.Empty;
+        var expectedProjectId = new Project();
         
         _mockSysMLService.Setup(s => s.CreateNewProjectAsync(
                 It.Is<string>(name => name == projectName),
@@ -111,7 +113,7 @@ public class SysMLApiServiceIntegrationTests
     public void CommitInformation_CanBeInstantiated()
     {
         // Act & Assert
-        var commitInfo = new CommitInformation();
+        var commitInfo = new Commit();
         Assert.NotNull(commitInfo);
     }
 

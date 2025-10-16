@@ -6,15 +6,13 @@ namespace Src.Services
 {
     public interface ISysMLApiService
     {
-        Task<string> CreateNewProjectAsync(string projectName, string projectDescription);
-        Task<Guid> CreateNewBranchAsync(Guid projectId, string branchName);
+        Task<Project> CreateNewProjectAsync(string projectName, string projectDescription);
+        Task<Branch> CreateNewBranchAsync(Guid projectId, string branchName);
 
-        Task<List<CommitInformation>> GetCommits(Guid projectId, Guid branchId);
+        Task<Element> CreateElementAsync(Guid projectId, Guid branchId, Element element);
+
+        Task<List<Commit>> GetCommits(Guid projectId, Guid branchId);
         Task<Guid> CommitElementToBranchAsync(Guid projectId, Guid branchId, Commit commit);
-    }
-
-    public class CommitInformation
-    {
     }
 
     // public class SysMLApiService : ISysMLApiService

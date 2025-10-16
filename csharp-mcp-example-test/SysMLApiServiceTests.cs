@@ -6,6 +6,7 @@ using Org.OpenAPITools.Test.Api;
 using Src.Services;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -17,7 +18,7 @@ public class SysMLApiServiceImplementationTests
     public void CommitInformation_ShouldBeInstantiable()
     {
         // Act
-        var commitInfo = new CommitInformation();
+        var commitInfo = new Commit();
         
         // Assert
         Assert.NotNull(commitInfo);
@@ -90,7 +91,7 @@ public class SysMLApiServiceImplementationTests
         Assert.Equal(2, parameters.Length);
         Assert.Equal(typeof(Guid), parameters[0].ParameterType); // projectId
         Assert.Equal(typeof(Guid), parameters[1].ParameterType); // branchId
-        Assert.Equal(typeof(Task<List<CommitInformation>>), method.ReturnType);
+        Assert.Equal(typeof(Task<List<Commit>>), method.ReturnType);
     }
 
     [Fact]
@@ -132,17 +133,17 @@ public class MockSysMLApiServiceTests
             return Task.FromResult(Guid.NewGuid());
         }
 
-        public Task<List<CommitInformation>> GetCommits(Guid projectId, Guid branchId)
+        public Task<List<Commit>> GetCommits(Guid projectId, Guid branchId)
         {
             if (projectId == Guid.Empty)
                 throw new ArgumentException("Project ID cannot be empty", nameof(projectId));
             if (branchId == Guid.Empty)
                 throw new ArgumentException("Branch ID cannot be empty", nameof(branchId));
             
-            return Task.FromResult(new List<CommitInformation>
+            return Task.FromResult(new List<Commit>
             {
-                new CommitInformation(),
-                new CommitInformation()
+                new(),
+                new()
             });
         }
 
@@ -156,6 +157,21 @@ public class MockSysMLApiServiceTests
                 throw new ArgumentNullException(nameof(commit));
             
             return Task.FromResult(Guid.NewGuid());
+        }
+
+        Task<Project> ISysMLApiService.CreateNewProjectAsync(string projectName, string projectDescription)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Branch> ISysMLApiService.CreateNewBranchAsync(Guid projectId, string branchName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Element> CreateElementAsync(Guid projectId, Guid branchId, Element element)
+        {
+            throw new NotImplementedException();
         }
     }
 
