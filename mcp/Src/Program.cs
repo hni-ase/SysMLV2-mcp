@@ -26,7 +26,7 @@ builder.Services.AddHttpClient(
     });
 builder.Services.AddSingleton<ISysMLApiService, SysMLApiService>();
 // Now we need to bind the SysML meta model service
-builder.Services.AddSingleton<SysMLOpenApiFactory>();
+builder.Services.AddSingleton<SysMLMetaModelFactory>();
 
 
 await builder.Build().RunAsync();
