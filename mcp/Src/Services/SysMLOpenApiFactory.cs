@@ -3,12 +3,12 @@ using System.Text.Json.Nodes;
 
 namespace mcp.Src.Services
 {
-    public class SysMLOpenApiFactory
+    public class SysMLMetaModelFactory
     {
-        private readonly Dictionary<string, JsonNode> _schemas;
+        public readonly Dictionary<string, JsonNode> _schemas;
         private readonly string _schemasPath;
 
-        public SysMLOpenApiFactory(string? schemasPath = null)
+        public SysMLMetaModelFactory(string? schemasPath = null)
         {
             _schemasPath = schemasPath ?? Path.Combine(Directory.GetCurrentDirectory(), "sysmlv2-api-spec", "metamodels");
             _schemas = new Dictionary<string, JsonNode>();
