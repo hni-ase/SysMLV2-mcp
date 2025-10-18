@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "nmf-ecore2code": {
+      "version": "2.0.457",
+      "commands": [
+        "ecore2code"
+      ],
+      "rollForward": false
+    }
+  }
+}
