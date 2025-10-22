@@ -22,6 +22,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using Org.OpenAPITools.Client;
+using System.Reflection;
 
 namespace Org.OpenAPITools.Model
 {
@@ -39,7 +40,11 @@ namespace Org.OpenAPITools.Model
         /// <param name="description">description</param>
         /// <param name="name">name</param>
         [JsonConstructor]
-        public Project(Option<Guid?> id = default, Option<TypeEnum?> type = default, Option<ProjectDefaultBranch?> defaultBranch = default, Option<string?> description = default, Option<string?> name = default)
+        public Project(Option<Guid?> id = default,
+            Option<TypeEnum?> type = default,
+            Option<ProjectDefaultBranch?> defaultBranch = default,
+            Option<string?> description = default,
+            Option<string?> name = default)
         {
             IdOption = id;
             TypeOption = type;

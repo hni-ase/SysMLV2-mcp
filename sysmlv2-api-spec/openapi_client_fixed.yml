@@ -4,7 +4,8 @@ info:
   title: SysML v2 API and Services
   version: 1.0.0
 servers:
-- url: /
+- url: http://localhost:9000
+  description: Local server for testing and development
 tags:
 - name: Project
 - name: Branch
@@ -78,7 +79,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Project'
+              $ref: '#/components/schemas/ProjectRequest'
         required: false
       responses:
         "201":
@@ -349,7 +350,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Branch'
+              $ref: '#/components/schemas/BranchRequest'
         required: true
       responses:
         "201":
@@ -1639,6 +1640,23 @@ components:
       content: {}
       description: Ok
   schemas:
+    ProjectRequest:
+      example:
+        '@type': Project
+        name: name
+        description: description
+        '@id': 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        '@type':
+          enum:
+          - Project
+          type: string
+        description:
+          type: string
+        name:
+          type: string
+      type: object
+      
     Project:
       example:
         '@type': Project
@@ -1655,10 +1673,6 @@ components:
           enum:
           - Project
           type: string
-        alias: 
-          type: array
-        created:
-          type: string
         defaultBranch:
           $ref: '#/components/schemas/Project_defaultBranch'
         description:
@@ -1666,6 +1680,26 @@ components:
         name:
           type: string
       type: object
+    
+
+
+    BranchRequest:
+      example:
+        head:
+          '@id': 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        '@type': Branch
+        name: name
+      properties:
+        '@type':
+          enum:
+          - Branch
+          type: string
+        head:
+          $ref: '#/components/schemas/Branch_head'
+        name:
+          type: string
+      type: object
+
     Branch:
       example:
         head:
@@ -1698,6 +1732,24 @@ components:
           format: date-time
           type: string
       type: object
+    
+    TagRequest:
+      example:
+        '@type': Tag
+        taggedCommit:
+          '@id': 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        name: name
+      properties:
+        '@type':
+          enum:
+          - Tag
+          type: string
+        name:
+          type: string
+        taggedCommit:
+          $ref: '#/components/schemas/Branch_head'
+      type: object
+
     Tag:
       example:
         '@type': Tag
@@ -1730,6 +1782,11 @@ components:
           format: date-time
           type: string
       type: object
+
+
+
+
+    
     Commit:
       example:
         '@type': Commit
@@ -1772,6 +1829,7 @@ components:
         previousCommit:
           $ref: '#/components/schemas/Branch_head'
       type: object
+    
     DataVersion:
       example:
         payload:

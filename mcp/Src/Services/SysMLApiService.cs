@@ -32,6 +32,10 @@ namespace mcp.Src.Services
                 {
                     WriteIndented = true,
                     DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault,
+                    IncludeFields = true,
+                    UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Skip,
+                    UnknownTypeHandling = System.Text.Json.Serialization.JsonUnknownTypeHandling.JsonElement,
+                    PropertyNameCaseInsensitive = true
                 }
             );
 
@@ -85,16 +89,27 @@ namespace mcp.Src.Services
                     null, projectDescription,
                     projectName));
 
-            if (response != null && response.TryCreated(out var project))
+            if (response != null && response.IsSuccessStatusCode)
             {
                 Console.WriteLine(response.ToString());
-                var newProjectId = project.Id;
+                var project = response.Created();
+                var newProjectId = project.Id ?? throw new Exception("project not created");
                 return project;
             }
             else
             {
                 throw new Exception("Failed to create project");
             }
+        }
+
+        public async Task<Project> GetProjectAsync(Guid projectId)
+        {
+            var response = await _projectApi.GetProjectByIdOrDefaultAsync(projectId);
+            if (response != null && response.TryOk(out var project))
+            {
+                return project;
+            }
+            throw new Exception($"Project with id {projectId} not found");
         }
 
         public async Task<Branch> CreateNewBranchAsync(Guid projectId, string branchName)
@@ -131,18 +146,28 @@ namespace mcp.Src.Services
             return new List<Commit>();
         }
 
-        public async Task<Guid> CommitElementToBranchAsync(Guid projectId, Guid branchId, Org.OpenAPITools.Model.Commit commit)
+        public async Task<Guid> CommitToBranchAsync(Guid projectId, Guid branchId, Org.OpenAPITools.Model.Commit commit)
         {
-            var apiInstance = _host.Services.GetRequiredService<ICommitApi>();
+            // var apiInstance = _host.Services.GetRequiredService<ICommitApi>();
             // var response = await apiInstance.PostCommitOrDefaultAsync(projectId, branchId, commit);
             // return response.Id;
             return new Guid();
         }
 
 
-        public Task<Element> CreateElementAsync(Guid projectId, Guid branchId, Element element)
+        public async Task<Element> CreateElementAsync(Guid projectId, Guid branchId, Element element)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Branch> GetBranchAsync(Guid projectId, Guid branchId)
+        {
+            var response = await _branchApi.GetBranchesByProjectAndIdOrDefaultAsync(projectId, branchId);
+            if (response != null && response.TryOk(out var branch))
+            {
+                return branch;
+            }
+            throw new Exception($"Branch with id {branchId} in project with id {projectId} not found");
         }
     }
 

@@ -147,7 +147,7 @@ public class MockSysMLApiServiceTests
             });
         }
 
-        public Task<Guid> CommitElementToBranchAsync(Guid projectId, Guid branchId, Commit commit)
+        public Task<Guid> CommitToBranchAsync(Guid projectId, Guid branchId, Commit commit)
         {
             if (projectId == Guid.Empty)
                 throw new ArgumentException("Project ID cannot be empty", nameof(projectId));
@@ -170,6 +170,16 @@ public class MockSysMLApiServiceTests
         }
 
         public Task<Element> CreateElementAsync(Guid projectId, Guid branchId, Element element)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Project> GetProjectAsync(Guid projectId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Branch> GetBranchAsync(Guid projectId, Guid branchId)
         {
             throw new NotImplementedException();
         }

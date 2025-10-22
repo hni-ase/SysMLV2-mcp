@@ -1,58 +1,20 @@
-using Org.OpenAPITools.Api;
 using Org.OpenAPITools.Model;
-using Org.OpenAPITools.Extensions;
 
-namespace Src.Services
+namespace Src.Services;
+
+public interface ISysMLApiService
 {
-    public interface ISysMLApiService
-    {
-        Task<Project> CreateNewProjectAsync(string projectName, string projectDescription);
-        Task<Branch> CreateNewBranchAsync(Guid projectId, string branchName);
+    Task<Project> CreateNewProjectAsync(string projectName, string projectDescription);
 
-        Task<Element> CreateElementAsync(Guid projectId, Guid branchId, Element element);
+    Task<Project> GetProjectAsync(Guid projectId);
 
-        Task<List<Commit>> GetCommits(Guid projectId, Guid branchId);
-        Task<Guid> CommitElementToBranchAsync(Guid projectId, Guid branchId, Commit commit);
-    }
+    Task<Branch> CreateNewBranchAsync(Guid projectId, string branchName);
 
-    // public class SysMLApiService : ISysMLApiService
-    // {
-    //     private const string BaseUrl = "http://localhost:9000"; // Example base URL
-    //     private readonly IHost _host;
+    Task<Branch> GetBranchAsync(Guid projectId, Guid branchId);
 
-    //     public SysMLApiService(IHost httpHost)
-    //     {
-    //         _host = httpHost;
-    //     }
+    Task<Element> CreateElementAsync(Guid projectId, Guid branchId, Element element);
 
-    //     public async Task<object> CreateModelAsync(object modelData)
-    //     {
-    //         var apiInstance = _host.Services.GetRequiredService<IProjectApi>();
-    //         Guid projectGuid = new();
-    //         Guid branchGuid = new();
-    //         var response = await apiInstance.PostProjectOrDefaultAsync(
-    //             new Project(projectGuid,
-    //             Project.TypeEnum.Project, new ProjectDefaultBranch(branchGuid), "This is a model description", "modelName"));
+    Task<List<Commit>> GetCommits(Guid projectId, Guid branchId);
 
-    //         // Now we need to add the model data to the project we just creatd
-    //         return response;
-    //     }
-
-    //     public Task<object> GetModelAsync(string modelId)
-    //     {
-    //         throw new NotImplementedException();
-    //     }
-
-    //     public Task<object> UpdateModelAsync(string modelId, object modelData)
-    //     {
-    //         throw new NotImplementedException();
-    //     }
-
-    //     public Task<bool> DeleteModelAsync(string modelId)
-    //     {
-    //         throw new NotImplementedException();
-    //     }
-
-
-    // }
+    Task<Guid> CommitToBranchAsync(Guid projectId, Guid branchId, Commit commit);
 }
