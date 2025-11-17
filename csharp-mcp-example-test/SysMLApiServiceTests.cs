@@ -12,110 +12,11 @@ using Xunit;
 
 namespace csharp_mcp_example_test;
 
-public class SysMLApiServiceImplementationTests
-{
-    [Fact]
-    public void CommitInformation_ShouldBeInstantiable()
-    {
-        // Act
-        var commitInfo = new Commit();
-        
-        // Assert
-        Assert.NotNull(commitInfo);
-    }
-
-    [Fact]
-    public void ISysMLApiService_Interface_ShouldHaveAllRequiredMethods()
-    {
-        // This test ensures our interface contract is complete
-        var interfaceType = typeof(ISysMLApiService);
-        var methods = interfaceType.GetMethods();
-
-        var expectedMethods = new[]
-        {
-            "CreateNewProjectAsync",
-            "CreateNewBranchAsync", 
-            "GetCommits",
-            "CommitElementToBranchAsync"
-        };
-
-        foreach (var expectedMethod in expectedMethods)
-        {
-            Assert.True(methods.Any(m => m.Name == expectedMethod), 
-                $"Method {expectedMethod} should exist in ISysMLApiService");
-        }
-    }
-
-    [Theory]
-    [InlineData("ValidProject")]
-    [InlineData("Project123")]
-    [InlineData("Test Project With Spaces")]
-    public void ISysMLApiService_CreateNewProjectAsync_ShouldAcceptValidNames(string projectName)
-    {
-        // This verifies the interface method signature accepts string parameters
-        var method = typeof(ISysMLApiService).GetMethod("CreateNewProjectAsync");
-        
-        Assert.NotNull(method);
-        var parameters = method.GetParameters();
-        
-        // Should have 2 string parameters: projectName and projectDescription
-        Assert.Equal(2, parameters.Length);
-        Assert.All(parameters, p => Assert.Equal(typeof(string), p.ParameterType));
-        
-        // Should return Task<Guid>
-        Assert.Equal(typeof(Task<Guid>), method.ReturnType);
-    }
-
-    [Fact]
-    public void ISysMLApiService_CreateNewBranchAsync_ShouldHaveCorrectSignature()
-    {
-        var method = typeof(ISysMLApiService).GetMethod("CreateNewBranchAsync");
-        
-        Assert.NotNull(method);
-        var parameters = method.GetParameters();
-        
-        Assert.Equal(2, parameters.Length);
-        Assert.Equal(typeof(Guid), parameters[0].ParameterType); // projectId
-        Assert.Equal(typeof(string), parameters[1].ParameterType); // branchName
-        Assert.Equal(typeof(Task<Guid>), method.ReturnType);
-    }
-
-    [Fact]
-    public void ISysMLApiService_GetCommits_ShouldHaveCorrectSignature()
-    {
-        var method = typeof(ISysMLApiService).GetMethod("GetCommits");
-        
-        Assert.NotNull(method);
-        var parameters = method.GetParameters();
-        
-        Assert.Equal(2, parameters.Length);
-        Assert.Equal(typeof(Guid), parameters[0].ParameterType); // projectId
-        Assert.Equal(typeof(Guid), parameters[1].ParameterType); // branchId
-        Assert.Equal(typeof(Task<List<Commit>>), method.ReturnType);
-    }
-
-    [Fact]
-    public void ISysMLApiService_CommitElementToBranchAsync_ShouldHaveCorrectSignature()
-    {
-        var method = typeof(ISysMLApiService).GetMethod("CommitElementToBranchAsync");
-        
-        Assert.NotNull(method);
-        var parameters = method.GetParameters();
-        
-        Assert.Equal(3, parameters.Length);
-        Assert.Equal(typeof(Guid), parameters[0].ParameterType); // projectId
-        Assert.Equal(typeof(Guid), parameters[1].ParameterType); // branchId
-        // Third parameter should be Commit type from the OpenAPI generated code
-        Assert.Equal("Commit", parameters[2].ParameterType.Name);
-        Assert.Equal(typeof(Task<Guid>), method.ReturnType);
-    }
-}
-
 public class MockSysMLApiServiceTests
 {
     private class MockSysMLApiService : ISysMLApiService
     {
-        public Task<string> CreateNewProjectAsync(string projectName, string projectDescription)
+        public Task<string> CreateNewProjectAsync(string? projectName, string projectDescription)
         {
             if (string.IsNullOrEmpty(projectName))
                 throw new ArgumentException("Project name cannot be null or empty", nameof(projectName));

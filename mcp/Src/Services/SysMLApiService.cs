@@ -32,10 +32,16 @@ namespace mcp.Src.Services
                 {
                     WriteIndented = true,
                     DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault,
-                    IncludeFields = true,
-                    UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Skip,
-                    UnknownTypeHandling = System.Text.Json.Serialization.JsonUnknownTypeHandling.JsonElement,
-                    PropertyNameCaseInsensitive = true
+                    Converters =
+                    {
+                        new ProjectJsonConverter(),
+                        new ProjectDefaultBranchJsonConverter(),
+                        new BranchJsonConverter(),
+                        new BranchHeadJsonConverter(),
+                        new BranchOwningProjectJsonConverter(),
+                        new CommitJsonConverter(),
+                        new DataVersionJsonConverter()
+                    }
                 }
             );
 
@@ -68,7 +74,7 @@ namespace mcp.Src.Services
                 _httpClient,
                 jsonSerializerOptionsProvider,
                 new RelationshipApiEvents());
-            
+
             _commitApi = new CommitApi(loggerFactory.CreateLogger<CommitApi>(),
                 loggerFactory,
                 _httpClient,
@@ -84,9 +90,13 @@ namespace mcp.Src.Services
         public async Task<Project> CreateNewProjectAsync(string projectName, string projectDescription)
         {
             var response = await _projectApi.PostProjectOrDefaultAsync(
-                new Project(null,
+                new Project(
+                    default,
                     Project.TypeEnum.Project,
-                    null, projectDescription,
+                    default,
+                    default,
+                    default,
+                    projectDescription,
                     projectName));
 
             if (response != null && response.IsSuccessStatusCode)
@@ -127,14 +137,25 @@ namespace mcp.Src.Services
                 defaultBranchResponse.TryOk(out var defaultBranch);
                 var branchHeadId = defaultBranch?.Head?.Id ?? throw new Exception("Default branch has no head");
                 // Now we can create the new branch
-                var response = await _branchApi.PostBranchByProjectOrDefaultAsync(projectGuid,
-                    new Branch(null, Branch.TypeEnum.Branch, new BranchHead(branchHeadId), branchName, null));
+                var response = await _branchApi.PostBranchByProjectOrDefaultAsync(
+                    projectGuid,
+                    new Branch(
+                        default,
+                        Branch.TypeEnum.Branch,
+                        default,
+                        default,
+                        default,
+                        default,
+                        new BranchHead(branchHeadId), branchName,
+                        default,
+                        default,
+                        default));
                 if (response != null && response.TryCreated(out var newBranch))
                 {
                     retval = newBranch;
                 }
             }
-            return retval?? throw new Exception("Failed to create branch");
+            return retval ?? throw new Exception("Failed to create branch");
         }
 
         public async Task<List<Commit>> GetCommits(Guid projectId, Guid branchId)
@@ -148,10 +169,15 @@ namespace mcp.Src.Services
 
         public async Task<Guid> CommitToBranchAsync(Guid projectId, Guid branchId, Org.OpenAPITools.Model.Commit commit)
         {
-            // var apiInstance = _host.Services.GetRequiredService<ICommitApi>();
-            // var response = await apiInstance.PostCommitOrDefaultAsync(projectId, branchId, commit);
-            // return response.Id;
-            return new Guid();
+            var response = await _commitApi.PostCommitByProjectOrDefaultAsync(projectId, commit, branchId);
+            if (response != null && response.TryCreated(out var createdCommit))
+            {
+                return createdCommit.Id ?? throw new Exception("Created commit has no id!");
+            }
+            else
+            {
+                throw new Exception($"Commit creation with body {commit} failed!");
+            }
         }
 
 
@@ -168,6 +194,30 @@ namespace mcp.Src.Services
                 return branch;
             }
             throw new Exception($"Branch with id {branchId} in project with id {projectId} not found");
+        }
+
+        public async Task<List<Element>> GetElementsAsync(Guid projectId, Guid commitId)
+        {
+            var response = await _elementApi.GetElementsByProjectCommitOrDefaultAsync(projectId, commitId);
+            if (response != null && response.TryOk(out var elements))
+            {
+                return elements;
+            } else
+            {
+                throw new Exception($"Failed to fetch elements for commit {commitId} in project {projectId}");
+            }
+        }
+
+        public async Task<List<Project>> GetProjects()
+        {
+            var response = await _projectApi.GetProjectsAsync();
+            if (response != null && response.TryOk(out var elements))
+            {
+                return elements;
+            } else
+            {
+                throw new Exception($"Failed to fetch projects!");
+            }
         }
     }
 

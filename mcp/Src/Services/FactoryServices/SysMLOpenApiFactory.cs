@@ -56,14 +56,10 @@ namespace mcp.Src.Services
             var schema = _schemas[elementName];
             var result = new JsonObject();
 
-            // Get properties from schema
-            var properties = schema?["properties"]?.AsObject();
-            if (properties == null)
-            {
-                return "{}";
-            }
+            // Get all properties from schema recursively
+            var allProperties = GetAllSchemaProperties(schema);
 
-            foreach (var property in properties)
+            foreach (var property in allProperties)
             {
                 var propertyName = property.Key;
                 var propertySchema = property.Value;
@@ -86,6 +82,57 @@ namespace mcp.Src.Services
                 WriteIndented = true,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
+        }
+
+        /// <summary>
+        /// Gets all properties from a schema, including those in anyOf definitions
+        /// </summary>
+        /// <param name="schema">The schema JSON node</param>
+        /// <returns>Dictionary mapping property names to their schema definitions</returns>
+        private Dictionary<string, JsonNode?> GetAllSchemaProperties(JsonNode? schema)
+        {
+            var result = new Dictionary<string, JsonNode?>();
+            
+            if (schema == null)
+            {
+                return result;
+            }
+
+            // Get properties from direct properties section
+            var directProperties = schema["properties"]?.AsObject();
+            if (directProperties != null)
+            {
+                foreach (var prop in directProperties)
+                {
+                    result[prop.Key] = prop.Value;
+                }
+            }
+
+            // Get properties from anyOf definitions
+            var anyOfArray = schema["anyOf"]?.AsArray();
+            if (anyOfArray != null)
+            {
+                foreach (var typeDefinition in anyOfArray)
+                {
+                    if (typeDefinition != null)
+                    {
+                        var typeProperties = typeDefinition["properties"]?.AsObject();
+                        if (typeProperties != null)
+                        {
+                            foreach (var prop in typeProperties)
+                            {
+                                // Don't overwrite existing properties
+                                if (!result.ContainsKey(prop.Key))
+                                {
+                                    result[prop.Key] = prop.Value;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
 
         private JsonNode? ConvertToJsonValue(object? value, JsonNode? propertySchema)
@@ -178,21 +225,194 @@ namespace mcp.Src.Services
             }
 
             var schema = _schemas[elementName];
-            var properties = schema?["properties"]?.AsObject();
+            return GetSchemaPropertiesRecursive(schema);
+        }
+
+        /// <summary>
+        /// Recursively extracts all properties from a schema JSON node, including properties from nested type definitions
+        /// </summary>
+        /// <param name="schemaNode">The schema JSON node to analyze</param>
+        /// <param name="visitedTypes">Set of visited type names to prevent infinite recursion</param>
+        /// <returns>Dictionary mapping property names to their types</returns>
+        public Dictionary<string, string> GetSchemaPropertiesRecursive(JsonNode? schemaNode, HashSet<string>? visitedTypes = null)
+        {
+            var result = new Dictionary<string, string>();
             
-            if (properties == null)
+            if (schemaNode == null)
             {
-                return new Dictionary<string, string>();
+                return result;
             }
 
-            var result = new Dictionary<string, string>();
-            foreach (var property in properties)
+            visitedTypes ??= new HashSet<string>();
+
+            // Handle direct properties at the root level
+            ExtractPropertiesFromNode(schemaNode, result);
+
+            // Handle anyOf array - contains multiple type definitions
+            var anyOfArray = schemaNode["anyOf"]?.AsArray();
+            if (anyOfArray != null)
             {
-                var type = property.Value?["type"]?.GetValue<string>() ?? "unknown";
-                result[property.Key] = type;
+                foreach (var typeDefinition in anyOfArray)
+                {
+                    if (typeDefinition != null)
+                    {
+                        ExtractPropertiesFromNode(typeDefinition, result);
+                        
+                        // Handle references to other schemas
+                        var refValue = typeDefinition["$ref"]?.GetValue<string>();
+                        if (!string.IsNullOrEmpty(refValue))
+                        {
+                            var referencedTypeName = ExtractTypeNameFromRef(refValue);
+                            if (!string.IsNullOrEmpty(referencedTypeName) && 
+                                !visitedTypes.Contains(referencedTypeName) && 
+                                _schemas.ContainsKey(referencedTypeName))
+                            {
+                                visitedTypes.Add(referencedTypeName);
+                                var referencedProperties = GetSchemaPropertiesRecursive(_schemas[referencedTypeName], visitedTypes);
+                                
+                                // Merge properties, giving priority to the current schema's properties
+                                foreach (var kvp in referencedProperties)
+                                {
+                                    if (!result.ContainsKey(kvp.Key))
+                                    {
+                                        result[kvp.Key] = kvp.Value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Handle $defs - nested type definitions
+            var defsNode = schemaNode["$defs"]?.AsObject();
+            if (defsNode != null)
+            {
+                foreach (var defPair in defsNode)
+                {
+                    var defTypeName = defPair.Key;
+                    if (!visitedTypes.Contains(defTypeName))
+                    {
+                        visitedTypes.Add(defTypeName);
+                        var defProperties = GetSchemaPropertiesRecursive(defPair.Value, visitedTypes);
+                        
+                        // Merge properties from definitions
+                        foreach (var kvp in defProperties)
+                        {
+                            if (!result.ContainsKey(kvp.Key))
+                            {
+                                result[kvp.Key] = kvp.Value;
+                            }
+                        }
+                    }
+                }
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Extracts properties directly from a JSON node's properties section
+        /// </summary>
+        /// <param name="node">The JSON node to extract properties from</param>
+        /// <param name="result">The dictionary to add extracted properties to</param>
+        private void ExtractPropertiesFromNode(JsonNode node, Dictionary<string, string> result)
+        {
+            var properties = node["properties"]?.AsObject();
+            if (properties == null)
+            {
+                return;
+            }
+
+            foreach (var property in properties)
+            {
+                var propertyName = property.Key;
+                var propertySchema = property.Value;
+                var propertyType = GetPropertyType(propertySchema);
+                
+                // Only add if not already present (gives priority to earlier definitions)
+                if (!result.ContainsKey(propertyName))
+                {
+                    result[propertyName] = propertyType;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines the type of a property from its schema definition
+        /// </summary>
+        /// <param name="propertySchema">The property schema JSON node</param>
+        /// <returns>A string representation of the property type</returns>
+        private string GetPropertyType(JsonNode? propertySchema)
+        {
+            if (propertySchema == null)
+            {
+                return "unknown";
+            }
+
+            // Handle const values first (higher priority than type)
+            var constValue = propertySchema["const"]?.GetValue<string>();
+            if (!string.IsNullOrEmpty(constValue))
+            {
+                return $"const:{constValue}";
+            }
+
+            // Handle direct type
+            var directType = propertySchema["type"]?.GetValue<string>();
+            if (!string.IsNullOrEmpty(directType))
+            {
+                if (directType == "array")
+                {
+                    var itemsType = GetPropertyType(propertySchema["items"]);
+                    return $"array<{itemsType}>";
+                }
+                return directType;
+            }
+
+            // Handle oneOf (union types)
+            var oneOfArray = propertySchema["oneOf"]?.AsArray();
+            if (oneOfArray != null && oneOfArray.Count > 0)
+            {
+                var types = new List<string>();
+                foreach (var option in oneOfArray)
+                {
+                    var optionType = GetPropertyType(option);
+                    if (!string.IsNullOrEmpty(optionType) && optionType != "unknown")
+                    {
+                        types.Add(optionType);
+                    }
+                }
+                return types.Count > 0 ? string.Join(" | ", types) : "unknown";
+            }
+
+            // Handle $ref (reference to another schema)
+            var refValue = propertySchema["$ref"]?.GetValue<string>();
+            if (!string.IsNullOrEmpty(refValue))
+            {
+                var referencedType = ExtractTypeNameFromRef(refValue);
+                return !string.IsNullOrEmpty(referencedType) ? $"ref:{referencedType}" : "ref:unknown";
+            }
+
+            return "unknown";
+        }
+
+        /// <summary>
+        /// Extracts the type name from a JSON Schema $ref URL
+        /// </summary>
+        /// <param name="refUrl">The $ref URL (e.g., "https://www.omg.org/spec/SysML/20250201/Element")</param>
+        /// <returns>The extracted type name (e.g., "Element")</returns>
+        private string ExtractTypeNameFromRef(string refUrl)
+        {
+            if (string.IsNullOrEmpty(refUrl))
+            {
+                return string.Empty;
+            }
+
+            // Extract the last part of the URL after the last slash
+            var lastSlashIndex = refUrl.LastIndexOf('/');
+            return lastSlashIndex >= 0 && lastSlashIndex < refUrl.Length - 1 
+                ? refUrl.Substring(lastSlashIndex + 1) 
+                : refUrl;
         }
     }
 }

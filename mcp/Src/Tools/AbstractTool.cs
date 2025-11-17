@@ -1,16 +1,16 @@
+using mcp.Src.Services;
+using MCP.Src.Services.FactoryServices;
+using Src.Services;
+
 namespace Tools
 {
-    public abstract class AbstractTool
+    public abstract class AbstractToolSet(ISysMLApiService sysMLApiService, SysMLMetaModelFactory metamodelFactory, string toolSetName)
     {
-        protected AbstractTool(string name, string description)
-        {
-            this.Name = name;
-            this.Description = description;
-        }
+        protected string _name { get; } = toolSetName;
 
-        public string Name { get; }
-        public string Description { get; }
+        protected ISysMLApiService _sysMLApiService { get; } = sysMLApiService;
 
-        public abstract void HandleOperation(object? value);
+        protected SysMLMetaModelFactory _metamodelFactory { get; } = metamodelFactory;
+
     }
 }

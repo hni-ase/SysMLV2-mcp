@@ -7,7 +7,6 @@ using Xunit;
 namespace csharp_mcp_example_test;
 public class SysMLOpenApiFactoryTests
 {
-    // private readonly string _testSchemasPath;
 
     private string GetSysMlSchemasPath()
     {

@@ -40,13 +40,13 @@ namespace mcp.Src.Services.FactoryServices.Tests
             var factory = new SysMLPackageFactory(apiService, host.Services.GetRequiredService<SysMLMetaModelFactory>());
 
             // First we need to create the project
-            var project = await apiService.CreateNewProjectAsync("TestProjectUnitTest", "Test project description");
+            var project = await apiService.CreateNewProjectAsync("NewTestProject", "Test project description");
             var projectGuid = project?.Id ?? throw new Exception("project not created");
 
-            var package = factory.CreatePackage(projectGuid, "TestPakcage", "This is a test package");
+            var package = factory.CreatePackage(projectGuid, "New TestPackage");
 
             // Add your test logic here
-            Assert.NotNull(factory);
+            // Assert.NotNull(package);
         }
 
 

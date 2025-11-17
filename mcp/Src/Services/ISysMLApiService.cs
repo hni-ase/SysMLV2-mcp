@@ -8,6 +8,8 @@ public interface ISysMLApiService
 
     Task<Project> GetProjectAsync(Guid projectId);
 
+    Task<List<Project>> GetProjects();
+
     Task<Branch> CreateNewBranchAsync(Guid projectId, string branchName);
 
     Task<Branch> GetBranchAsync(Guid projectId, Guid branchId);
@@ -17,4 +19,6 @@ public interface ISysMLApiService
     Task<List<Commit>> GetCommits(Guid projectId, Guid branchId);
 
     Task<Guid> CommitToBranchAsync(Guid projectId, Guid branchId, Commit commit);
+
+    Task<List<Element>> GetElementsAsync(Guid projectId, Guid commitId);
 }

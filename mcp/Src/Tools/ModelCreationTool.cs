@@ -8,17 +8,15 @@ using Src.Services;
 using mcp.Src.Services;
 using System.Runtime.CompilerServices;
 using ModelContextProtocol.Protocol;
+using MCP.Src.Services.FactoryServices;
 
 [McpServerToolType]
-public class ModelCreationTools
+public class ModelCreationTools 
 {
 
-    ISysMLApiService _sysMLApiService;
-
-    public ModelCreationTools(ISysMLApiService sysMLApiService)
+    public ModelCreationTools()
     {
         Debug.WriteLine("Model Creation Tool Initialized");
-        _sysMLApiService = sysMLApiService;
     }
 
 
@@ -48,6 +46,27 @@ public class ModelCreationTools
     {
         throw new NotImplementedException();
         // return string.Format("Element '{0}' created successfully.", elementName);
+    }
+
+    [McpServerTool, Description("Creates a new relationship between two elements in the specified project.")]
+    public static Guid CreatePackage(McpServer server, string projectName, string packageName, Guid parentPackageGuid)
+    {
+        Debug.WriteLine("Package creation tool is handling operation...");
+        var apiService = server.Services?.GetService<ISysMLApiService>();
+        var metamodelFactory = server.Services?.GetService<SysMLMetaModelFactory>();
+        var packageFactory = new SysMLPackageFactory(apiService, metamodelFactory);
+        // 1. Check if the project exists, if not, return an Error
+        var projects = apiService.GetProjects().GetAwaiter().GetResult();
+        // if the package doesn't exist we need to get it. 
+        var foundProject = projects.FirstOrDefault(p => p.Name == projectName) ?? throw new Exception($"project with name {projectName} not found!");
+        var packageGuid = packageFactory.CreatePackage((Guid)foundProject.Id, packageName, packageName, parentPackageGuid);
+
+        
+
+        // if t
+
+        return Guid.Empty;
+
     }
 
     [McpServerTool, Description("Creates a new use case in the specified project.")]
