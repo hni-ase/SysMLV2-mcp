@@ -1180,7 +1180,7 @@ namespace Org.OpenAPITools.Api
             /// Returns true if the response is 201 Created
             /// </summary>
             /// <returns></returns>
-            public bool IsCreated => 201 == (int)StatusCode;
+            public bool IsCreated => (201 == (int)StatusCode) || (200 == (int)StatusCode);
 
             /// <summary>
             /// Deserializes the response if the response is 201 Created

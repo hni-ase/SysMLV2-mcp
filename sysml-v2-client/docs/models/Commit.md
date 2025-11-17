@@ -6,6 +6,9 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Id** | **Guid** |  | [optional] 
 **Type** | **string** |  | [optional] 
+**Alias** | **List&lt;string&gt;** |  | [optional] 
+**Created** | **string** |  | [optional] 
+**Description** | **string** |  | [optional] 
 **Change** | [**List&lt;DataVersion&gt;**](DataVersion.md) |  | [optional] 
 **OwningProject** | [**BranchOwningProject**](BranchOwningProject.md) |  | [optional] 
 **PreviousCommit** | [**BranchHead**](BranchHead.md) |  | [optional] 

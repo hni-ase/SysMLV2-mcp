@@ -1657,6 +1657,8 @@ components:
           type: string
         alias: 
           type: array
+          items:
+            type: string
         created:
           type: string
         defaultBranch:
@@ -1685,6 +1687,16 @@ components:
         '@type':
           enum:
           - Branch
+          type: string
+        alias: 
+          type: array
+          items:
+            type: string
+        created:
+          type: string
+        deleted:
+          type: string
+        description:
           type: string
         head:
           $ref: '#/components/schemas/Branch_head'
@@ -1762,6 +1774,14 @@ components:
         '@type':
           enum:
           - Commit
+          type: string
+        alias: 
+          type: array
+          items:
+            type: string
+        created:
+          type: string
+        description:
           type: string
         change:
           items:

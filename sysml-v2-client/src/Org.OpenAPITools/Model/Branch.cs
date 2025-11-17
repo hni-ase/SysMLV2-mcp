@@ -35,16 +35,24 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <param name="id">id</param>
         /// <param name="type">type</param>
+        /// <param name="alias">alias</param>
+        /// <param name="created">created</param>
+        /// <param name="deleted">deleted</param>
+        /// <param name="description">description</param>
         /// <param name="head">head</param>
         /// <param name="name">name</param>
         /// <param name="owningProject">owningProject</param>
         /// <param name="referencedCommit">referencedCommit</param>
         /// <param name="timestamp">timestamp</param>
         [JsonConstructor]
-        public Branch(Option<Guid?> id = default, Option<TypeEnum?> type = default, Option<BranchHead?> head = default, Option<string?> name = default, Option<BranchOwningProject?> owningProject = default, Option<BranchHead?> referencedCommit = default, Option<DateTime?> timestamp = default)
+        public Branch(Option<Guid?> id = default, Option<TypeEnum?> type = default, Option<List<string>?> alias = default, Option<string?> created = default, Option<string?> deleted = default, Option<string?> description = default, Option<BranchHead?> head = default, Option<string?> name = default, Option<BranchOwningProject?> owningProject = default, Option<BranchHead?> referencedCommit = default, Option<DateTime?> timestamp = default)
         {
             IdOption = id;
             TypeOption = type;
+            AliasOption = alias;
+            CreatedOption = created;
+            DeletedOption = deleted;
+            DescriptionOption = description;
             HeadOption = head;
             NameOption = name;
             OwningProjectOption = owningProject;
@@ -134,6 +142,58 @@ namespace Org.OpenAPITools.Model
         public Guid? Id { get { return this.IdOption; } set { this.IdOption = new(value); } }
 
         /// <summary>
+        /// Used to track the state of Alias
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<List<string>?> AliasOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets Alias
+        /// </summary>
+        [JsonPropertyName("alias")]
+        public List<string>? Alias { get { return this.AliasOption; } set { this.AliasOption = new(value); } }
+
+        /// <summary>
+        /// Used to track the state of Created
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<string?> CreatedOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets Created
+        /// </summary>
+        [JsonPropertyName("created")]
+        public string? Created { get { return this.CreatedOption; } set { this.CreatedOption = new(value); } }
+
+        /// <summary>
+        /// Used to track the state of Deleted
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<string?> DeletedOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets Deleted
+        /// </summary>
+        [JsonPropertyName("deleted")]
+        public string? Deleted { get { return this.DeletedOption; } set { this.DeletedOption = new(value); } }
+
+        /// <summary>
+        /// Used to track the state of Description
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<string?> DescriptionOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets Description
+        /// </summary>
+        [JsonPropertyName("description")]
+        public string? Description { get { return this.DescriptionOption; } set { this.DescriptionOption = new(value); } }
+
+        /// <summary>
         /// Used to track the state of Head
         /// </summary>
         [JsonIgnore]
@@ -208,6 +268,10 @@ namespace Org.OpenAPITools.Model
             sb.Append("class Branch {\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
             sb.Append("  Type: ").Append(Type).Append("\n");
+            sb.Append("  Alias: ").Append(Alias).Append("\n");
+            sb.Append("  Created: ").Append(Created).Append("\n");
+            sb.Append("  Deleted: ").Append(Deleted).Append("\n");
+            sb.Append("  Description: ").Append(Description).Append("\n");
             sb.Append("  Head: ").Append(Head).Append("\n");
             sb.Append("  Name: ").Append(Name).Append("\n");
             sb.Append("  OwningProject: ").Append(OwningProject).Append("\n");
@@ -257,6 +321,10 @@ namespace Org.OpenAPITools.Model
 
             Option<Guid?> id = default;
             Option<Branch.TypeEnum?> type = default;
+            Option<List<string>?> alias = default;
+            Option<string?> created = default;
+            Option<string?> deleted = default;
+            Option<string?> description = default;
             Option<BranchHead?> head = default;
             Option<string?> name = default;
             Option<BranchOwningProject?> owningProject = default;
@@ -286,6 +354,18 @@ namespace Org.OpenAPITools.Model
                             if (typeRawValue != null)
                                 type = new Option<Branch.TypeEnum?>(Branch.TypeEnumFromStringOrDefault(typeRawValue));
                             break;
+                        case "alias":
+                            alias = new Option<List<string>?>(JsonSerializer.Deserialize<List<string>>(ref utf8JsonReader, jsonSerializerOptions)!);
+                            break;
+                        case "created":
+                            created = new Option<string?>(utf8JsonReader.GetString()!);
+                            break;
+                        case "deleted":
+                            deleted = new Option<string?>(utf8JsonReader.GetString()!);
+                            break;
+                        case "description":
+                            description = new Option<string?>(utf8JsonReader.GetString()!);
+                            break;
                         case "head":
                             head = new Option<BranchHead?>(JsonSerializer.Deserialize<BranchHead>(ref utf8JsonReader, jsonSerializerOptions)!);
                             break;
@@ -302,6 +382,8 @@ namespace Org.OpenAPITools.Model
                             timestamp = new Option<DateTime?>(JsonSerializer.Deserialize<DateTime>(ref utf8JsonReader, jsonSerializerOptions));
                             break;
                         default:
+                            // Skip unknown properties
+                            utf8JsonReader.Skip();
                             break;
                     }
                 }
@@ -313,22 +395,34 @@ namespace Org.OpenAPITools.Model
             if (type.IsSet && type.Value == null)
                 throw new ArgumentNullException(nameof(type), "Property is not nullable for class Branch.");
 
-            if (head.IsSet && head.Value == null)
-                throw new ArgumentNullException(nameof(head), "Property is not nullable for class Branch.");
+            // if (alias.IsSet && alias.Value == null)
+            //     throw new ArgumentNullException(nameof(alias), "Property is not nullable for class Branch.");
 
-            if (name.IsSet && name.Value == null)
-                throw new ArgumentNullException(nameof(name), "Property is not nullable for class Branch.");
+            // if (created.IsSet && created.Value == null)
+            //     throw new ArgumentNullException(nameof(created), "Property is not nullable for class Branch.");
 
-            if (owningProject.IsSet && owningProject.Value == null)
-                throw new ArgumentNullException(nameof(owningProject), "Property is not nullable for class Branch.");
+            // if (deleted.IsSet && deleted.Value == null)
+            //     throw new ArgumentNullException(nameof(deleted), "Property is not nullable for class Branch.");
 
-            if (referencedCommit.IsSet && referencedCommit.Value == null)
-                throw new ArgumentNullException(nameof(referencedCommit), "Property is not nullable for class Branch.");
+            // if (description.IsSet && description.Value == null)
+            //     throw new ArgumentNullException(nameof(description), "Property is not nullable for class Branch.");
 
-            if (timestamp.IsSet && timestamp.Value == null)
-                throw new ArgumentNullException(nameof(timestamp), "Property is not nullable for class Branch.");
+            // if (head.IsSet && head.Value == null)
+            //     throw new ArgumentNullException(nameof(head), "Property is not nullable for class Branch.");
 
-            return new Branch(id, type, head, name, owningProject, referencedCommit, timestamp);
+            // if (name.IsSet && name.Value == null)
+            //     throw new ArgumentNullException(nameof(name), "Property is not nullable for class Branch.");
+
+            // if (owningProject.IsSet && owningProject.Value == null)
+            //     throw new ArgumentNullException(nameof(owningProject), "Property is not nullable for class Branch.");
+
+            // if (referencedCommit.IsSet && referencedCommit.Value == null)
+            //     throw new ArgumentNullException(nameof(referencedCommit), "Property is not nullable for class Branch.");
+
+            // if (timestamp.IsSet && timestamp.Value == null)
+            //     throw new ArgumentNullException(nameof(timestamp), "Property is not nullable for class Branch.");
+
+            return new Branch(id, type, alias, created, deleted, description, head, name, owningProject, referencedCommit, timestamp);
         }
 
         /// <summary>
@@ -355,6 +449,18 @@ namespace Org.OpenAPITools.Model
         /// <exception cref="NotImplementedException"></exception>
         public void WriteProperties(Utf8JsonWriter writer, Branch branch, JsonSerializerOptions jsonSerializerOptions)
         {
+            if (branch.AliasOption.IsSet && branch.Alias == null)
+                throw new ArgumentNullException(nameof(branch.Alias), "Property is required for class Branch.");
+
+            if (branch.CreatedOption.IsSet && branch.Created == null)
+                throw new ArgumentNullException(nameof(branch.Created), "Property is required for class Branch.");
+
+            if (branch.DeletedOption.IsSet && branch.Deleted == null)
+                throw new ArgumentNullException(nameof(branch.Deleted), "Property is required for class Branch.");
+
+            if (branch.DescriptionOption.IsSet && branch.Description == null)
+                throw new ArgumentNullException(nameof(branch.Description), "Property is required for class Branch.");
+
             if (branch.HeadOption.IsSet && branch.Head == null)
                 throw new ArgumentNullException(nameof(branch.Head), "Property is required for class Branch.");
 
@@ -372,6 +478,20 @@ namespace Org.OpenAPITools.Model
 
             var typeRawValue = Branch.TypeEnumToJsonValue(branch.TypeOption.Value!.Value);
             writer.WriteString("@type", typeRawValue);
+            if (branch.AliasOption.IsSet)
+            {
+                writer.WritePropertyName("alias");
+                JsonSerializer.Serialize(writer, branch.Alias, jsonSerializerOptions);
+            }
+            if (branch.CreatedOption.IsSet)
+                writer.WriteString("created", branch.Created);
+
+            if (branch.DeletedOption.IsSet)
+                writer.WriteString("deleted", branch.Deleted);
+
+            if (branch.DescriptionOption.IsSet)
+                writer.WriteString("description", branch.Description);
+
             if (branch.HeadOption.IsSet)
             {
                 writer.WritePropertyName("head");

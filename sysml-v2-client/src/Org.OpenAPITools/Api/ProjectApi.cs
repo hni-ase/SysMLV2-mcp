@@ -21,7 +21,6 @@ using System.Text.Json;
 using Org.OpenAPITools.Client;
 using Org.OpenAPITools.Model;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Json;
 
 namespace Org.OpenAPITools.Api
 {
@@ -589,7 +588,7 @@ namespace Org.OpenAPITools.Api
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 OnErrorDeleteProjectByIdDefaultImplementation(e, "/projects/{projectId}", uriBuilderLocalVar.Path, projectId);
                 Events.ExecuteOnErrorDeleteProjectById(e);
@@ -648,15 +647,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryOk([NotNullWhen(true)] out Org.OpenAPITools.Model.Project? result)
+            public bool TryOk([NotNullWhen(true)]out Org.OpenAPITools.Model.Project? result)
             {
                 result = null;
 
                 try
                 {
                     result = Ok();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)200);
                 }
@@ -693,15 +691,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryUnsupportedMediaType([NotNullWhen(true)] out Org.OpenAPITools.Model.Error? result)
+            public bool TryUnsupportedMediaType([NotNullWhen(true)]out Org.OpenAPITools.Model.Error? result)
             {
                 result = null;
 
                 try
                 {
                     result = UnsupportedMediaType();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)415);
                 }
@@ -732,15 +729,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryInternalServerError([NotNullWhen(true)] out Org.OpenAPITools.Model.Error? result)
+            public bool TryInternalServerError([NotNullWhen(true)]out Org.OpenAPITools.Model.Error? result)
             {
                 result = null;
 
                 try
                 {
                     result = InternalServerError();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)500);
                 }
@@ -888,7 +884,7 @@ namespace Org.OpenAPITools.Api
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 OnErrorGetProjectByIdDefaultImplementation(e, "/projects/{projectId}", uriBuilderLocalVar.Path, projectId);
                 Events.ExecuteOnErrorGetProjectById(e);
@@ -947,15 +943,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryOk([NotNullWhen(true)] out Org.OpenAPITools.Model.Project? result)
+            public bool TryOk([NotNullWhen(true)]out Org.OpenAPITools.Model.Project? result)
             {
                 result = null;
 
                 try
                 {
                     result = Ok();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)200);
                 }
@@ -992,15 +987,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryUnsupportedMediaType([NotNullWhen(true)] out Org.OpenAPITools.Model.Error? result)
+            public bool TryUnsupportedMediaType([NotNullWhen(true)]out Org.OpenAPITools.Model.Error? result)
             {
                 result = null;
 
                 try
                 {
                     result = UnsupportedMediaType();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)415);
                 }
@@ -1031,15 +1025,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryInternalServerError([NotNullWhen(true)] out Org.OpenAPITools.Model.Error? result)
+            public bool TryInternalServerError([NotNullWhen(true)]out Org.OpenAPITools.Model.Error? result)
             {
                 result = null;
 
                 try
                 {
                     result = InternalServerError();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)500);
                 }
@@ -1228,7 +1221,7 @@ namespace Org.OpenAPITools.Api
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 OnErrorGetProjectsDefaultImplementation(e, "/projects", uriBuilderLocalVar.Path, pageAfter, pageBefore, pageSize);
                 Events.ExecuteOnErrorGetProjects(e);
@@ -1287,15 +1280,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryOk([NotNullWhen(true)] out List<Project>? result)
+            public bool TryOk([NotNullWhen(true)]out List<Project>? result)
             {
                 result = null;
 
                 try
                 {
                     result = Ok();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)200);
                 }
@@ -1326,15 +1318,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryUnsupportedMediaType([NotNullWhen(true)] out Org.OpenAPITools.Model.Error? result)
+            public bool TryUnsupportedMediaType([NotNullWhen(true)]out Org.OpenAPITools.Model.Error? result)
             {
                 result = null;
 
                 try
                 {
                     result = UnsupportedMediaType();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)415);
                 }
@@ -1365,15 +1356,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryInternalServerError([NotNullWhen(true)] out Org.OpenAPITools.Model.Error? result)
+            public bool TryInternalServerError([NotNullWhen(true)]out Org.OpenAPITools.Model.Error? result)
             {
                 result = null;
 
                 try
                 {
                     result = InternalServerError();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)500);
                 }
@@ -1547,7 +1537,7 @@ namespace Org.OpenAPITools.Api
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 OnErrorPostProjectDefaultImplementation(e, "/projects", uriBuilderLocalVar.Path, body);
                 Events.ExecuteOnErrorPostProject(e);
@@ -1606,15 +1596,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryCreated([NotNullWhen(true)] out Org.OpenAPITools.Model.Project? result)
+            public bool TryCreated([NotNullWhen(true)]out Org.OpenAPITools.Model.Project? result)
             {
                 result = null;
 
                 try
                 {
                     result = Created();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)201);
                 }
@@ -1645,15 +1634,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryUnsupportedMediaType([NotNullWhen(true)] out Org.OpenAPITools.Model.Error? result)
+            public bool TryUnsupportedMediaType([NotNullWhen(true)]out Org.OpenAPITools.Model.Error? result)
             {
                 result = null;
 
                 try
                 {
                     result = UnsupportedMediaType();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)415);
                 }
@@ -1684,15 +1672,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryInternalServerError([NotNullWhen(true)] out Org.OpenAPITools.Model.Error? result)
+            public bool TryInternalServerError([NotNullWhen(true)]out Org.OpenAPITools.Model.Error? result)
             {
                 result = null;
 
                 try
                 {
                     result = InternalServerError();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)500);
                 }
@@ -1873,7 +1860,7 @@ namespace Org.OpenAPITools.Api
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 OnErrorPutProjectByIdDefaultImplementation(e, "/projects/{projectId}", uriBuilderLocalVar.Path, projectId, body);
                 Events.ExecuteOnErrorPutProjectById(e);
@@ -1932,15 +1919,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryOk([NotNullWhen(true)] out Org.OpenAPITools.Model.Project? result)
+            public bool TryOk([NotNullWhen(true)]out Org.OpenAPITools.Model.Project? result)
             {
                 result = null;
 
                 try
                 {
                     result = Ok();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)200);
                 }
@@ -1971,15 +1957,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryUnsupportedMediaType([NotNullWhen(true)] out Org.OpenAPITools.Model.Error? result)
+            public bool TryUnsupportedMediaType([NotNullWhen(true)]out Org.OpenAPITools.Model.Error? result)
             {
                 result = null;
 
                 try
                 {
                     result = UnsupportedMediaType();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)415);
                 }
@@ -2010,15 +1995,14 @@ namespace Org.OpenAPITools.Api
             /// </summary>
             /// <param name="result"></param>
             /// <returns></returns>
-            public bool TryInternalServerError([NotNullWhen(true)] out Org.OpenAPITools.Model.Error? result)
+            public bool TryInternalServerError([NotNullWhen(true)]out Org.OpenAPITools.Model.Error? result)
             {
                 result = null;
 
                 try
                 {
                     result = InternalServerError();
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)500);
                 }

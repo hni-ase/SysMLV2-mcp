@@ -35,14 +35,20 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <param name="id">id</param>
         /// <param name="type">type</param>
+        /// <param name="alias">alias</param>
+        /// <param name="created">created</param>
+        /// <param name="description">description</param>
         /// <param name="change">change</param>
         /// <param name="owningProject">owningProject</param>
         /// <param name="previousCommit">previousCommit</param>
         [JsonConstructor]
-        public Commit(Option<Guid?> id = default, Option<TypeEnum?> type = default, Option<List<DataVersion>?> change = default, Option<BranchOwningProject?> owningProject = default, Option<BranchHead?> previousCommit = default)
+        public Commit(Option<Guid?> id = default, Option<TypeEnum?> type = default, Option<List<string>?> alias = default, Option<string?> created = default, Option<string?> description = default, Option<List<DataVersion>?> change = default, Option<BranchOwningProject?> owningProject = default, Option<BranchHead?> previousCommit = default)
         {
             IdOption = id;
             TypeOption = type;
+            AliasOption = alias;
+            CreatedOption = created;
+            DescriptionOption = description;
             ChangeOption = change;
             OwningProjectOption = owningProject;
             PreviousCommitOption = previousCommit;
@@ -130,6 +136,45 @@ namespace Org.OpenAPITools.Model
         public Guid? Id { get { return this.IdOption; } set { this.IdOption = new(value); } }
 
         /// <summary>
+        /// Used to track the state of Alias
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<List<string>?> AliasOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets Alias
+        /// </summary>
+        [JsonPropertyName("alias")]
+        public List<string>? Alias { get { return this.AliasOption; } set { this.AliasOption = new(value); } }
+
+        /// <summary>
+        /// Used to track the state of Created
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<string?> CreatedOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets Created
+        /// </summary>
+        [JsonPropertyName("created")]
+        public string? Created { get { return this.CreatedOption; } set { this.CreatedOption = new(value); } }
+
+        /// <summary>
+        /// Used to track the state of Description
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<string?> DescriptionOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets Description
+        /// </summary>
+        [JsonPropertyName("description")]
+        public string? Description { get { return this.DescriptionOption; } set { this.DescriptionOption = new(value); } }
+
+        /// <summary>
         /// Used to track the state of Change
         /// </summary>
         [JsonIgnore]
@@ -178,6 +223,9 @@ namespace Org.OpenAPITools.Model
             sb.Append("class Commit {\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
             sb.Append("  Type: ").Append(Type).Append("\n");
+            sb.Append("  Alias: ").Append(Alias).Append("\n");
+            sb.Append("  Created: ").Append(Created).Append("\n");
+            sb.Append("  Description: ").Append(Description).Append("\n");
             sb.Append("  Change: ").Append(Change).Append("\n");
             sb.Append("  OwningProject: ").Append(OwningProject).Append("\n");
             sb.Append("  PreviousCommit: ").Append(PreviousCommit).Append("\n");
@@ -220,6 +268,9 @@ namespace Org.OpenAPITools.Model
 
             Option<Guid?> id = default;
             Option<Commit.TypeEnum?> type = default;
+            Option<List<string>?> alias = default;
+            Option<string?> created = default;
+            Option<string?> description = default;
             Option<List<DataVersion>?> change = default;
             Option<BranchOwningProject?> owningProject = default;
             Option<BranchHead?> previousCommit = default;
@@ -247,6 +298,15 @@ namespace Org.OpenAPITools.Model
                             if (typeRawValue != null)
                                 type = new Option<Commit.TypeEnum?>(Commit.TypeEnumFromStringOrDefault(typeRawValue));
                             break;
+                        case "alias":
+                            alias = new Option<List<string>?>(JsonSerializer.Deserialize<List<string>>(ref utf8JsonReader, jsonSerializerOptions)!);
+                            break;
+                        case "created":
+                            created = new Option<string?>(utf8JsonReader.GetString()!);
+                            break;
+                        case "description":
+                            description = new Option<string?>(utf8JsonReader.GetString()!);
+                            break;
                         case "change":
                             change = new Option<List<DataVersion>?>(JsonSerializer.Deserialize<List<DataVersion>>(ref utf8JsonReader, jsonSerializerOptions)!);
                             break;
@@ -257,6 +317,8 @@ namespace Org.OpenAPITools.Model
                             previousCommit = new Option<BranchHead?>(JsonSerializer.Deserialize<BranchHead>(ref utf8JsonReader, jsonSerializerOptions)!);
                             break;
                         default:
+                            // Skip unknown properties
+                            utf8JsonReader.Skip();
                             break;
                     }
                 }
@@ -268,16 +330,16 @@ namespace Org.OpenAPITools.Model
             if (type.IsSet && type.Value == null)
                 throw new ArgumentNullException(nameof(type), "Property is not nullable for class Commit.");
 
+            if (created.IsSet && created.Value == null)
+                throw new ArgumentNullException(nameof(created), "Property is not nullable for class Commit.");
+
             if (change.IsSet && change.Value == null)
                 throw new ArgumentNullException(nameof(change), "Property is not nullable for class Commit.");
 
             if (owningProject.IsSet && owningProject.Value == null)
                 throw new ArgumentNullException(nameof(owningProject), "Property is not nullable for class Commit.");
 
-            if (previousCommit.IsSet && previousCommit.Value == null)
-                throw new ArgumentNullException(nameof(previousCommit), "Property is not nullable for class Commit.");
-
-            return new Commit(id, type, change, owningProject, previousCommit);
+            return new Commit(id, type, alias, created, description, change, owningProject, previousCommit);
         }
 
         /// <summary>
@@ -304,6 +366,15 @@ namespace Org.OpenAPITools.Model
         /// <exception cref="NotImplementedException"></exception>
         public void WriteProperties(Utf8JsonWriter writer, Commit commit, JsonSerializerOptions jsonSerializerOptions)
         {
+            if (commit.AliasOption.IsSet && commit.Alias == null)
+                throw new ArgumentNullException(nameof(commit.Alias), "Property is required for class Commit.");
+
+            if (commit.CreatedOption.IsSet && commit.Created == null)
+                throw new ArgumentNullException(nameof(commit.Created), "Property is required for class Commit.");
+
+            if (commit.DescriptionOption.IsSet && commit.Description == null)
+                throw new ArgumentNullException(nameof(commit.Description), "Property is required for class Commit.");
+
             if (commit.ChangeOption.IsSet && commit.Change == null)
                 throw new ArgumentNullException(nameof(commit.Change), "Property is required for class Commit.");
 
@@ -318,6 +389,17 @@ namespace Org.OpenAPITools.Model
 
             var typeRawValue = Commit.TypeEnumToJsonValue(commit.TypeOption.Value!.Value);
             writer.WriteString("@type", typeRawValue);
+            if (commit.AliasOption.IsSet)
+            {
+                writer.WritePropertyName("alias");
+                JsonSerializer.Serialize(writer, commit.Alias, jsonSerializerOptions);
+            }
+            if (commit.CreatedOption.IsSet)
+                writer.WriteString("created", commit.Created);
+
+            if (commit.DescriptionOption.IsSet)
+                writer.WriteString("description", commit.Description);
+
             if (commit.ChangeOption.IsSet)
             {
                 writer.WritePropertyName("change");

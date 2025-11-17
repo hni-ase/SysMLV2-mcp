@@ -22,7 +22,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using Org.OpenAPITools.Client;
-using System.Reflection;
 
 namespace Org.OpenAPITools.Model
 {
@@ -36,18 +35,18 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <param name="id">id</param>
         /// <param name="type">type</param>
+        /// <param name="alias">alias</param>
+        /// <param name="created">created</param>
         /// <param name="defaultBranch">defaultBranch</param>
         /// <param name="description">description</param>
         /// <param name="name">name</param>
         [JsonConstructor]
-        public Project(Option<Guid?> id = default,
-            Option<TypeEnum?> type = default,
-            Option<ProjectDefaultBranch?> defaultBranch = default,
-            Option<string?> description = default,
-            Option<string?> name = default)
+        public Project(Option<Guid?> id = default, Option<TypeEnum?> type = default, Option<List<string>?> alias = default, Option<string?> created = default, Option<ProjectDefaultBranch?> defaultBranch = default, Option<string?> description = default, Option<string?> name = default)
         {
             IdOption = id;
             TypeOption = type;
+            AliasOption = alias;
+            CreatedOption = created;
             DefaultBranchOption = defaultBranch;
             DescriptionOption = description;
             NameOption = name;
@@ -135,6 +134,32 @@ namespace Org.OpenAPITools.Model
         public Guid? Id { get { return this.IdOption; } set { this.IdOption = new(value); } }
 
         /// <summary>
+        /// Used to track the state of Alias
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<List<string>?> AliasOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets Alias
+        /// </summary>
+        [JsonPropertyName("alias")]
+        public List<string>? Alias { get { return this.AliasOption; } set { this.AliasOption = new(value); } }
+
+        /// <summary>
+        /// Used to track the state of Created
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<string?> CreatedOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets Created
+        /// </summary>
+        [JsonPropertyName("created")]
+        public string? Created { get { return this.CreatedOption; } set { this.CreatedOption = new(value); } }
+
+        /// <summary>
         /// Used to track the state of DefaultBranch
         /// </summary>
         [JsonIgnore]
@@ -183,6 +208,8 @@ namespace Org.OpenAPITools.Model
             sb.Append("class Project {\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
             sb.Append("  Type: ").Append(Type).Append("\n");
+            sb.Append("  Alias: ").Append(Alias).Append("\n");
+            sb.Append("  Created: ").Append(Created).Append("\n");
             sb.Append("  DefaultBranch: ").Append(DefaultBranch).Append("\n");
             sb.Append("  Description: ").Append(Description).Append("\n");
             sb.Append("  Name: ").Append(Name).Append("\n");
@@ -225,6 +252,8 @@ namespace Org.OpenAPITools.Model
 
             Option<Guid?> id = default;
             Option<Project.TypeEnum?> type = default;
+            Option<List<string>?> alias = default;
+            Option<string?> created = default;
             Option<ProjectDefaultBranch?> defaultBranch = default;
             Option<string?> description = default;
             Option<string?> name = default;
@@ -252,6 +281,12 @@ namespace Org.OpenAPITools.Model
                             if (typeRawValue != null)
                                 type = new Option<Project.TypeEnum?>(Project.TypeEnumFromStringOrDefault(typeRawValue));
                             break;
+                        case "alias":
+                            alias = new Option<List<string>?>(JsonSerializer.Deserialize<List<string>>(ref utf8JsonReader, jsonSerializerOptions)!);
+                            break;
+                        case "created":
+                            created = new Option<string?>(utf8JsonReader.GetString()!);
+                            break;
                         case "defaultBranch":
                             defaultBranch = new Option<ProjectDefaultBranch?>(JsonSerializer.Deserialize<ProjectDefaultBranch>(ref utf8JsonReader, jsonSerializerOptions)!);
                             break;
@@ -262,6 +297,8 @@ namespace Org.OpenAPITools.Model
                             name = new Option<string?>(utf8JsonReader.GetString()!);
                             break;
                         default:
+                            // Skip unknown properties
+                            utf8JsonReader.Skip();
                             break;
                     }
                 }
@@ -273,6 +310,12 @@ namespace Org.OpenAPITools.Model
             if (type.IsSet && type.Value == null)
                 throw new ArgumentNullException(nameof(type), "Property is not nullable for class Project.");
 
+            if (alias.IsSet && alias.Value == null)
+                throw new ArgumentNullException(nameof(alias), "Property is not nullable for class Project.");
+
+            if (created.IsSet && created.Value == null)
+                throw new ArgumentNullException(nameof(created), "Property is not nullable for class Project.");
+
             if (defaultBranch.IsSet && defaultBranch.Value == null)
                 throw new ArgumentNullException(nameof(defaultBranch), "Property is not nullable for class Project.");
 
@@ -282,7 +325,7 @@ namespace Org.OpenAPITools.Model
             if (name.IsSet && name.Value == null)
                 throw new ArgumentNullException(nameof(name), "Property is not nullable for class Project.");
 
-            return new Project(id, type, defaultBranch, description, name);
+            return new Project(id, type, alias, created, defaultBranch, description, name);
         }
 
         /// <summary>
@@ -309,6 +352,12 @@ namespace Org.OpenAPITools.Model
         /// <exception cref="NotImplementedException"></exception>
         public void WriteProperties(Utf8JsonWriter writer, Project project, JsonSerializerOptions jsonSerializerOptions)
         {
+            if (project.AliasOption.IsSet && project.Alias == null)
+                throw new ArgumentNullException(nameof(project.Alias), "Property is required for class Project.");
+
+            if (project.CreatedOption.IsSet && project.Created == null)
+                throw new ArgumentNullException(nameof(project.Created), "Property is required for class Project.");
+
             if (project.DefaultBranchOption.IsSet && project.DefaultBranch == null)
                 throw new ArgumentNullException(nameof(project.DefaultBranch), "Property is required for class Project.");
 
@@ -323,6 +372,14 @@ namespace Org.OpenAPITools.Model
 
             var typeRawValue = Project.TypeEnumToJsonValue(project.TypeOption.Value!.Value);
             writer.WriteString("@type", typeRawValue);
+            if (project.AliasOption.IsSet)
+            {
+                writer.WritePropertyName("alias");
+                JsonSerializer.Serialize(writer, project.Alias, jsonSerializerOptions);
+            }
+            if (project.CreatedOption.IsSet)
+                writer.WriteString("created", project.Created);
+
             if (project.DefaultBranchOption.IsSet)
             {
                 writer.WritePropertyName("defaultBranch");

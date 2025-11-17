@@ -6,6 +6,10 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Id** | **Guid** |  | [optional] 
 **Type** | **string** |  | [optional] 
+**Alias** | **List&lt;string&gt;** |  | [optional] 
+**Created** | **string** |  | [optional] 
+**Deleted** | **string** |  | [optional] 
+**Description** | **string** |  | [optional] 
 **Head** | [**BranchHead**](BranchHead.md) |  | [optional] 
 **Name** | **string** |  | [optional] 
 **OwningProject** | [**BranchOwningProject**](BranchOwningProject.md) |  | [optional] 

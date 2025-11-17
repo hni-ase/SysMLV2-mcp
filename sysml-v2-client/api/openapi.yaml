@@ -1820,6 +1820,12 @@ components:
           enum:
           - Project
           type: string
+        alias:
+          items:
+            type: string
+          type: array
+        created:
+          type: string
         defaultBranch:
           $ref: "#/components/schemas/Project_defaultBranch"
         description:
@@ -1846,6 +1852,16 @@ components:
         '@type':
           enum:
           - Branch
+          type: string
+        alias:
+          items:
+            type: string
+          type: array
+        created:
+          type: string
+        deleted:
+          type: string
+        description:
           type: string
         head:
           $ref: "#/components/schemas/Branch_head"
@@ -1923,6 +1939,14 @@ components:
         '@type':
           enum:
           - Commit
+          type: string
+        alias:
+          items:
+            type: string
+          type: array
+        created:
+          type: string
+        description:
           type: string
         change:
           items:

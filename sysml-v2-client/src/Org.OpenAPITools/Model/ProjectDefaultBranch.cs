@@ -123,6 +123,8 @@ namespace Org.OpenAPITools.Model
                             id = new Option<Guid?>(utf8JsonReader.TokenType == JsonTokenType.Null ? (Guid?)null : utf8JsonReader.GetGuid());
                             break;
                         default:
+                            // Skip unknown properties
+                            utf8JsonReader.Skip();
                             break;
                     }
                 }

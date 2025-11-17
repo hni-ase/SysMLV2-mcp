@@ -68,7 +68,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets additional properties
         /// </summary>
         [JsonExtensionData]
-        public Dictionary<string, JsonElement> AdditionalProperties { get; } = new Dictionary<string, JsonElement>();
+        public Dictionary<string, JsonElement> AdditionalProperties { get; set; } = new Dictionary<string, JsonElement>();
 
         /// <summary>
         /// Returns the string presentation of the object

@@ -6,6 +6,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Id** | **Guid** |  | [optional] 
 **Type** | **string** |  | [optional] 
+**Alias** | **List&lt;string&gt;** |  | [optional] 
+**Created** | **string** |  | [optional] 
 **DefaultBranch** | [**ProjectDefaultBranch**](ProjectDefaultBranch.md) |  | [optional] 
 **Description** | **string** |  | [optional] 
 **Name** | **string** |  | [optional] 

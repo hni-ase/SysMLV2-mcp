@@ -237,6 +237,8 @@ namespace Org.OpenAPITools.Model
                             identity = new Option<DataIdentity?>(JsonSerializer.Deserialize<DataIdentity>(ref utf8JsonReader, jsonSerializerOptions)!);
                             break;
                         default:
+                            // Skip unknown properties
+                            utf8JsonReader.Skip();
                             break;
                     }
                 }
