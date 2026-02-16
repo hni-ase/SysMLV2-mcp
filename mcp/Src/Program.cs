@@ -1,19 +1,25 @@
 using mcp.Src.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Src.Services;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+
+
 
 const string SYSML_DATABASE_CLIENT_NAME = "SysMLV2-Database-Client";
 const string SYSML_DATABSE_SERVER_URL = "http://localhost:9000";
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 builder.Logging.
     AddConsole(consoleLogOptions =>
     {
         consoleLogOptions.LogToStandardErrorThreshold = LogLevel.Error;
     });
+
+
 builder.Services
     .AddMcpServer()
-    .WithStdioServerTransport()
-    .WithToolsFromAssembly();
+    .WithToolsFromAssembly().WithStdioServerTransport();
 
 builder.Services.AddHttpClient(
     SYSML_DATABASE_CLIENT_NAME,

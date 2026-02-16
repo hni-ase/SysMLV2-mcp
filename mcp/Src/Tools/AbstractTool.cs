@@ -8,9 +8,13 @@ namespace Tools
     {
         protected string _name { get; } = toolSetName;
 
+
+
         protected ISysMLApiService _sysMLApiService { get; } = sysMLApiService;
 
         protected SysMLMetaModelFactory _metamodelFactory { get; } = metamodelFactory;
+
+        public abstract Guid PerformOperation(object input);
 
     }
 }

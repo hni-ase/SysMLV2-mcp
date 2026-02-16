@@ -84,6 +84,16 @@ public class MockSysMLApiServiceTests
         {
             throw new NotImplementedException();
         }
+
+        public Task<List<Project>> GetProjects()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Element>> GetElementsAsync(Guid projectId, Guid commitId)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     private readonly MockSysMLApiService _service;
