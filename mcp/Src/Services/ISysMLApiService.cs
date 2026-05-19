@@ -1,24 +1,30 @@
-using Org.OpenAPITools.Model;
+using SysMLV2.MCP.Models;
 
 namespace Src.Services;
 
 public interface ISysMLApiService
 {
-    Task<Project> CreateNewProjectAsync(string projectName, string projectDescription);
+    Task<SysMLProject> CreateNewProjectAsync(string projectName, string projectDescription);
 
-    Task<Project> GetProjectAsync(Guid projectId);
+    Task<SysMLProject> GetProjectAsync(Guid projectId);
 
-    Task<List<Project>> GetProjects();
+    Task<List<SysMLProject>> GetProjects();
 
-    Task<Branch> CreateNewBranchAsync(Guid projectId, string branchName);
+    Task<List<SysMLBranch>> GetBranchesAsync(Guid projectId);
 
-    Task<Branch> GetBranchAsync(Guid projectId, Guid branchId);
+    Task<SysMLBranch> CreateNewBranchAsync(Guid projectId, string branchName);
 
-    Task<Element> CreateElementAsync(Guid projectId, Guid branchId, Element element);
+    Task<SysMLBranch> GetBranchAsync(Guid projectId, Guid branchId);
 
-    Task<List<Commit>> GetCommits(Guid projectId, Guid branchId);
+    Task<SysMLCommit> GetCommitAsync(Guid projectId, Guid commitId);
 
-    Task<Guid> CommitToBranchAsync(Guid projectId, Guid branchId, Commit commit);
+    Task<SysMLElement> CreateElementAsync(Guid projectId, Guid branchId, SysMLElement element);
 
-    Task<List<Element>> GetElementsAsync(Guid projectId, Guid commitId);
+    Task<SysMLElement> GetElementByIdAsync(Guid projectId, Guid commitId, Guid elementId);
+
+    Task<List<SysMLCommit>> GetCommits(Guid projectId, Guid branchId);
+
+    Task<Guid> CommitToBranchAsync(Guid projectId, Guid branchId, CommitRequest commit);
+
+    Task<List<SysMLElement>> GetElementsAsync(Guid projectId, Guid commitId);
 }

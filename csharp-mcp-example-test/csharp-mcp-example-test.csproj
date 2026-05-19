@@ -28,13 +28,12 @@
 
   <ItemGroup>
     <ProjectReference Include="../mcp/csharp-mcp-example.csproj" />
-    <ProjectReference Include="../sysml-v2-client/src/Org.OpenAPITools.Test/Org.OpenAPITools.Test.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-  <Content Update="../sysmlv2-api-spec/metamodels/*.json">
-    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-  </Content>
-</ItemGroup>
+    <Content Update="../sysmlv2-api-spec/metamodels/*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>

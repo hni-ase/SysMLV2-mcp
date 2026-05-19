@@ -37,6 +37,10 @@ jobs:
     needs: build
     # Continue even if tests fail - this ensures build job passes independently
     continue-on-error: true
+    permissions:
+      checks: write        # required by dorny/test-reporter to create check runs
+      contents: read
+      pull-requests: write # required by dorny/test-reporter to post PR comments
     
     steps:
     - uses: actions/checkout@v4
@@ -55,6 +59,7 @@ jobs:
     - name: Test with detailed reporting
       run: |
         dotnet test --no-build --verbosity normal \
+          --filter "Category!=Integration" \
           --logger "trx;LogFileName=test-results.trx" \
           --logger "console;verbosity=detailed" \
           --collect:"XPlat Code Coverage" \

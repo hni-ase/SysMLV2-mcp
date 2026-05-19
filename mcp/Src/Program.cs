@@ -1,8 +1,7 @@
 using mcp.Src.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Src.Services;
-using System.Net.Http.Headers;
-using System.Security.Claims;
+using System.IO;
 
 
 
@@ -32,7 +31,24 @@ builder.Services.AddHttpClient(
     });
 builder.Services.AddSingleton<ISysMLApiService, SysMLApiService>();
 // Now we need to bind the SysML meta model service
-builder.Services.AddSingleton<SysMLMetaModelFactory>();
+builder.Services.AddSingleton(new SysMLMetaModelFactory(ResolveSchemasPath(builder.Environment.ContentRootPath)));
 
 
 await builder.Build().RunAsync();
+
+static string ResolveSchemasPath(string contentRootPath)
+{
+    var candidates = new[]
+    {
+        Path.Combine(contentRootPath, "..", "sysmlv2-api-spec", "metamodels"),
+        Path.Combine(contentRootPath, "sysmlv2-api-spec", "metamodels"),
+        Path.Combine(Directory.GetCurrentDirectory(), "sysmlv2-api-spec", "metamodels"),
+        Path.Combine(Directory.GetCurrentDirectory(), "..", "sysmlv2-api-spec", "metamodels")
+    };
+
+    var found = candidates
+        .Select(Path.GetFullPath)
+        .FirstOrDefault(Directory.Exists);
+
+    return found ?? Path.GetFullPath(Path.Combine(contentRootPath, "..", "sysmlv2-api-spec", "metamodels"));
+}
