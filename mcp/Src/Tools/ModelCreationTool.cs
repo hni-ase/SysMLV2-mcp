@@ -324,6 +324,33 @@ public class ModelCreationTools
         };
     }
 
+    [McpServerTool, Description("Returns all schema-defined attributes for a given SysML V2 element type, split into required and optional, each mapped to its JSON Schema type description. Use this when you know the type name but do not have an element ID. If the type name is not found an error listing all available types is thrown.")]
+    public static ElementSchemaInfo DescribeTypeSchema(
+        McpServer server,
+        string elementType)
+    {
+        var metamodelFactory = RequireMetaModelFactory(server);
+
+        var availableTypes = metamodelFactory.GetAvailableSchemas().OrderBy(x => x).ToList();
+        if (!availableTypes.Contains(elementType))
+            throw new ArgumentException(
+                $"Unknown element type '{elementType}'. Available types: {string.Join(", ", availableTypes)}");
+
+        var (required, allProperties) = metamodelFactory.GetTypeAttributeInfo(elementType);
+
+        return new ElementSchemaInfo
+        {
+            ElementId = "",
+            Type = elementType,
+            RequiredAttributes = allProperties
+                .Where(kv => required.Contains(kv.Key))
+                .ToDictionary(kv => kv.Key, kv => kv.Value),
+            OptionalAttributes = allProperties
+                .Where(kv => !required.Contains(kv.Key))
+                .ToDictionary(kv => kv.Key, kv => kv.Value),
+        };
+    }
+
     [McpServerTool, Description("Updates specific attributes on an existing SysML V2 element. Pass attributesJson as a JSON object string, e.g. {\"name\":\"NewName\",\"reqId\":\"REQ-002\"}. The element @type and all current attribute values are preserved; only the supplied attributes are overwritten. Attributes that do not exist in the element's schema are reported as invalid and skipped — no error is thrown.")]
     public static ElementUpdateResult UpdateElementAttributes(
         McpServer server,
@@ -419,6 +446,99 @@ public class ModelCreationTools
             Message = invalid.Count > 0
                 ? $"Updated {updated.Count} attribute(s). {invalid.Count} attribute(s) were invalid and skipped."
                 : $"Successfully updated {updated.Count} attribute(s)."
+        };
+    }
+
+    [McpServerTool, Description("Creates a new SysML V2 element of the given type and commits it under the specified parent. Use DescribeTypeSchema first to discover valid attribute names. Pass attributesJson as a JSON object string, e.g. {\"name\":\"MyElement\",\"isAbstract\":false}. Pass parentElementId to nest the element inside a package or another element; omit or pass null to create at the project root. @id and @type are managed automatically and must not appear in attributesJson. Attributes not in the schema are reported as invalid and excluded without failing.")]
+    public static ElementCreationResult CreateElementOfType(
+        McpServer server,
+        string projectName,
+        string elementType,
+        string attributesJson,
+        string? parentElementId = null)
+    {
+        var apiService = RequireApiService(server);
+        var metamodelFactory = RequireMetaModelFactory(server);
+
+        if (!metamodelFactory.GetAvailableSchemas().Contains(elementType))
+            throw new ArgumentException(
+                $"Unknown element type '{elementType}'. Call DescribeTypeSchema for valid types.");
+
+        Dictionary<string, JsonElement> attributes;
+        try
+        {
+            attributes = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(attributesJson)
+                         ?? throw new ArgumentException("attributesJson parsed to null.");
+        }
+        catch (JsonException ex)
+        {
+            throw new ArgumentException($"attributesJson is not valid JSON: {ex.Message}");
+        }
+
+        var validAttributeNames = metamodelFactory.GetSchemaProperties(elementType).Keys.ToHashSet(StringComparer.Ordinal);
+        var applied = new List<string>();
+        var invalid = new List<string>();
+
+        foreach (var key in attributes.Keys)
+        {
+            if (key == "@id" || key == "@type")
+                invalid.Add($"{key} (reserved: managed automatically)");
+            else if (validAttributeNames.Contains(key))
+                applied.Add(key);
+            else
+                invalid.Add(key);
+        }
+
+        Guid? parentId = null;
+        if (!string.IsNullOrWhiteSpace(parentElementId) && Guid.TryParse(parentElementId, out var parsedParent))
+            parentId = parsedParent;
+
+        var project = FindProjectByName(apiService, projectName);
+        var projectId = project.Id ?? throw new Exception("Project has no ID.");
+        var defaultBranchId = project.DefaultBranch?.Id ?? throw new Exception("Project has no default branch.");
+
+        var newElementId = Guid.NewGuid();
+        var payload = new Dictionary<string, JsonElement>
+        {
+            ["@id"]   = JsonSerializer.SerializeToElement(newElementId),
+            ["@type"] = JsonSerializer.SerializeToElement(elementType)
+        };
+
+        if (parentId.HasValue)
+        {
+            var ownerRef = JsonSerializer.SerializeToElement(new SysMLRef(parentId.Value));
+            payload["owner"] = ownerRef;
+            payload["owningNamespace"] = ownerRef;
+        }
+
+        foreach (var key in applied)
+            payload[key] = attributes[key];
+
+        var createCommitRequest = new CommitRequest
+        {
+            Change =
+            [
+                new DataVersionRequest
+                {
+                    Identity = new SysMLRef(newElementId),
+                    Payload  = JsonSerializer.SerializeToElement(payload)
+                }
+            ]
+        };
+
+        apiService.CommitToBranchAsync(projectId, defaultBranchId, createCommitRequest).GetAwaiter().GetResult();
+
+        return new ElementCreationResult
+        {
+            ElementId = newElementId.ToString(),
+            Type = elementType,
+            ParentId = parentId?.ToString(),
+            AppliedAttributes = applied,
+            InvalidAttributes = invalid,
+            Success = true,
+            Message = invalid.Count > 0
+                ? $"Element of type '{elementType}' created with {applied.Count} attribute(s). {invalid.Count} attribute(s) were invalid and excluded."
+                : $"Element of type '{elementType}' created successfully with {applied.Count} attribute(s)."
         };
     }
 
