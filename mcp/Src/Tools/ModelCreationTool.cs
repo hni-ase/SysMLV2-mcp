@@ -201,6 +201,50 @@ public class ModelCreationTools
         throw new NotImplementedException();
     }
 
+    [McpServerTool, Description("Creates a RequirementUsage element in the specified project. Optionally nested under a parent package.")]
+    public static Guid CreateRequirement(
+        McpServer server,
+        string projectName,
+        string requirementName,
+        string requirementText,
+        string? reqId = null,
+        Guid parentPackageGuid = default)
+    {
+        var apiService = RequireApiService(server);
+        var project = FindProjectByName(apiService, projectName);
+        var factory = new SysMLRequirementFactory(apiService);
+        return factory.CreateRequirement(
+            project.Id!.Value,
+            requirementName,
+            requirementText,
+            reqId,
+            parentPackageGuid)
+            .GetAwaiter().GetResult();
+    }
+
+    [McpServerTool, Description("Creates a RequirementDefinition element in the specified project. Optionally nested under a parent package.")]
+    public static Guid CreateRequirementDefinition(
+        McpServer server,
+        string projectName,
+        string definitionName,
+        string definitionText,
+        string? reqId = null,
+        bool isAbstract = false,
+        Guid parentPackageGuid = default)
+    {
+        var apiService = RequireApiService(server);
+        var project = FindProjectByName(apiService, projectName);
+        var factory = new SysMLRequirementFactory(apiService);
+        return factory.CreateRequirementDefinition(
+            project.Id!.Value,
+            definitionName,
+            definitionText,
+            reqId,
+            isAbstract,
+            parentPackageGuid)
+            .GetAwaiter().GetResult();
+    }
+
     private static ISysMLApiService RequireApiService(McpServer server)
     {
         return server.Services?.GetService<ISysMLApiService>() ?? throw new Exception("ISysMLApiService is not registered.");
