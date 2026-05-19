@@ -414,5 +414,42 @@ namespace mcp.Src.Services
                 ? refUrl.Substring(lastSlashIndex + 1) 
                 : refUrl;
         }
+
+        /// <summary>
+        /// Returns all schema properties for a type split into required and optional sets.
+        /// "Required" properties are those listed in the schema's required arrays (root and anyOf entries).
+        /// "Optional" properties are all schema properties not present in any required array.
+        /// </summary>
+        public (HashSet<string> Required, Dictionary<string, string> AllProperties) GetTypeAttributeInfo(string typeName)
+        {
+            var allProperties = GetSchemaProperties(typeName);
+            var required = new HashSet<string>(StringComparer.Ordinal);
+
+            if (!_schemas.TryGetValue(typeName, out var schema))
+                return (required, allProperties);
+
+            // Collect required entries from root level
+            CollectRequiredFromNode(schema, required);
+
+            // Collect required entries from anyOf branches
+            var anyOfArray = schema["anyOf"]?.AsArray();
+            if (anyOfArray != null)
+                foreach (var entry in anyOfArray)
+                    if (entry != null)
+                        CollectRequiredFromNode(entry, required);
+
+            return (required, allProperties);
+        }
+
+        private static void CollectRequiredFromNode(JsonNode node, HashSet<string> required)
+        {
+            var arr = node["required"]?.AsArray();
+            if (arr == null) return;
+            foreach (var item in arr)
+            {
+                var name = item?.GetValue<string>();
+                if (name != null) required.Add(name);
+            }
+        }
     }
 }

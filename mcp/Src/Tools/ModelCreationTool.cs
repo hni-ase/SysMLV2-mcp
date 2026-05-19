@@ -293,6 +293,135 @@ public class ModelCreationTools
             .GetAwaiter().GetResult();
     }
 
+    [McpServerTool, Description("Fetches an element by ID and returns its SysML V2 type together with all schema-defined attributes split into required and optional, each mapped to its JSON Schema type description. Use this before UpdateElementAttributes to discover valid attribute names.")]
+    public static ElementSchemaInfo DescribeElementSchema(
+        McpServer server,
+        string projectName,
+        Guid elementId)
+    {
+        var apiService = RequireApiService(server);
+        var metamodelFactory = RequireMetaModelFactory(server);
+        var project = FindProjectByName(apiService, projectName);
+        var (projectId, headCommitId) = GetProjectAndHeadCommitOrDefault(apiService, project);
+        if (headCommitId == Guid.Empty)
+            throw new Exception($"Project '{projectName}' has no commits yet.");
+
+        var element = apiService.GetElementByIdAsync(projectId, headCommitId, elementId).GetAwaiter().GetResult();
+        var type = element.Type ?? throw new Exception($"Element '{elementId}' has no @type.");
+
+        var (required, allProperties) = metamodelFactory.GetTypeAttributeInfo(type);
+
+        return new ElementSchemaInfo
+        {
+            ElementId = elementId.ToString(),
+            Type = type,
+            RequiredAttributes = allProperties
+                .Where(kv => required.Contains(kv.Key))
+                .ToDictionary(kv => kv.Key, kv => kv.Value),
+            OptionalAttributes = allProperties
+                .Where(kv => !required.Contains(kv.Key))
+                .ToDictionary(kv => kv.Key, kv => kv.Value),
+        };
+    }
+
+    [McpServerTool, Description("Updates specific attributes on an existing SysML V2 element. Pass attributesJson as a JSON object string, e.g. {\"name\":\"NewName\",\"reqId\":\"REQ-002\"}. The element @type and all current attribute values are preserved; only the supplied attributes are overwritten. Attributes that do not exist in the element's schema are reported as invalid and skipped — no error is thrown.")]
+    public static ElementUpdateResult UpdateElementAttributes(
+        McpServer server,
+        string projectName,
+        Guid elementId,
+        string attributesJson)
+    {
+        var apiService = RequireApiService(server);
+        var metamodelFactory = RequireMetaModelFactory(server);
+
+        Dictionary<string, JsonElement> updates;
+        try
+        {
+            updates = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(attributesJson)
+                      ?? throw new ArgumentException("attributesJson parsed to null.");
+        }
+        catch (JsonException ex)
+        {
+            throw new ArgumentException($"attributesJson is not valid JSON: {ex.Message}");
+        }
+
+        var project = FindProjectByName(apiService, projectName);
+        var projectId = project.Id ?? throw new Exception("Project has no ID.");
+        var defaultBranchId = project.DefaultBranch?.Id ?? throw new Exception("Project has no default branch.");
+
+        var branch = apiService.GetBranchAsync(projectId, defaultBranchId).GetAwaiter().GetResult();
+        var headCommitId = branch.Head?.Id ?? throw new Exception("Branch has no head commit.");
+
+        var element = apiService.GetElementByIdAsync(projectId, headCommitId, elementId).GetAwaiter().GetResult();
+        var type = element.Type ?? throw new Exception($"Element '{elementId}' has no @type.");
+
+        var validAttributeNames = metamodelFactory.GetSchemaProperties(type).Keys.ToHashSet(StringComparer.Ordinal);
+
+        var updated = new List<string>();
+        var invalid = new List<string>();
+
+        foreach (var key in updates.Keys)
+        {
+            if (key == "@id")
+                invalid.Add($"{key} (read-only: element identity cannot be changed)");
+            else if (validAttributeNames.Contains(key) || key.StartsWith("@"))
+                updated.Add(key);
+            else
+                invalid.Add(key);
+        }
+
+        if (updated.Count == 0)
+        {
+            return new ElementUpdateResult
+            {
+                ElementId = elementId.ToString(),
+                Type = type,
+                UpdatedAttributes = updated,
+                InvalidAttributes = invalid,
+                Success = false,
+                Message = "No valid attributes to update. Use DescribeElementSchema to discover valid attribute names."
+            };
+        }
+
+        var payload = new Dictionary<string, JsonElement>
+        {
+            ["@id"]   = JsonSerializer.SerializeToElement(element.Id!.Value),
+            ["@type"] = JsonSerializer.SerializeToElement(element.Type!)
+        };
+        if (element.AdditionalProperties != null)
+            foreach (var kvp in element.AdditionalProperties)
+                payload[kvp.Key] = kvp.Value;
+
+        foreach (var key in updated)
+            payload[key] = updates[key];
+
+        var commitRequest = new CommitRequest
+        {
+            Change =
+            [
+                new DataVersionRequest
+                {
+                    Identity = new SysMLRef(elementId),
+                    Payload  = JsonSerializer.SerializeToElement(payload)
+                }
+            ]
+        };
+
+        apiService.CommitToBranchAsync(projectId, defaultBranchId, commitRequest).GetAwaiter().GetResult();
+
+        return new ElementUpdateResult
+        {
+            ElementId = elementId.ToString(),
+            Type = type,
+            UpdatedAttributes = updated,
+            InvalidAttributes = invalid,
+            Success = true,
+            Message = invalid.Count > 0
+                ? $"Updated {updated.Count} attribute(s). {invalid.Count} attribute(s) were invalid and skipped."
+                : $"Successfully updated {updated.Count} attribute(s)."
+        };
+    }
+
     private static ISysMLApiService RequireApiService(McpServer server)
     {
         return server.Services?.GetService<ISysMLApiService>() ?? throw new Exception("ISysMLApiService is not registered.");
