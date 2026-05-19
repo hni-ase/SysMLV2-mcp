@@ -6,50 +6,72 @@ using Microsoft.Extensions.Logging;
 
 namespace mcp.Src.Services.FactoryServices.Tests
 {
-
     public class SysMLPackageFactoryTest
     {
-
-
-        [Fact]
-        public async Task SysMLPackageFactory_CreatePackage_MustCreatePackageInDatabase()
+        private static (SysMLApiService apiService, SysMLPackageFactory factory) BuildServices()
         {
-            // Create an Http Host
-            var hostBuilder = Host.CreateDefaultBuilder()
-                .ConfigureServices((context, services) =>
+            var host = Host.CreateDefaultBuilder()
+                .ConfigureServices((_, services) =>
                 {
-                    // Add logging
-                    services.AddLogging(builder => builder.AddConsole());
-                    
-                    // Add HTTP client factory
+                    services.AddLogging(b => b.AddConsole());
+
                     services.AddHttpClient("SysMLV2-Database-Client", client =>
                     {
                         client.BaseAddress = new Uri("http://localhost:9000");
                         client.DefaultRequestHeaders.UserAgent.ParseAdd("dotnet-test");
                     });
-                    
-                    // Add the SysML metamodel factory with the correct path to schemas
-                    // var schemasPath = Path.Combine(Directory.GetCurrentDirectory(), "sysmlv2-api-spec", "metamodels");
-                    var schemasPath =  Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
+
+                    var schemasPath = Path.Combine(Directory.GetCurrentDirectory(),
+                        "..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
                     services.AddSingleton(new SysMLMetaModelFactory(schemasPath));
-                });
+                })
+                .Build();
 
-            var host = hostBuilder.Build();
+            var apiService = new SysMLApiService(host.Services.GetRequiredService<IHttpClientFactory>());
+            var factory = new SysMLPackageFactory(apiService,
+                host.Services.GetRequiredService<SysMLMetaModelFactory>());
 
-            var apiService = new SysMLApiService(host);
-            var factory = new SysMLPackageFactory(apiService, host.Services.GetRequiredService<SysMLMetaModelFactory>());
-
-            // First we need to create the project
-            var project = await apiService.CreateNewProjectAsync("NewTestProject", "Test project description");
-            var projectGuid = project?.Id ?? throw new Exception("project not created");
-
-            var package = factory.CreatePackage(projectGuid, "New TestPackage");
-
-            // Add your test logic here
-            // Assert.NotNull(package);
+            return (apiService, factory);
         }
 
+        [Fact]
+        public async Task CreatePackage_CreatesPackageInProject()
+        {
+            var (apiService, factory) = BuildServices();
 
+            var project = await apiService.CreateNewProjectAsync(
+                $"PackageFactoryTest-{Guid.NewGuid():N}", "Test project description");
+            var projectGuid = project?.Id ?? throw new Exception("project not created");
+
+            var packageGuid = await factory.CreatePackage(projectGuid, "NewTestPackage");
+
+            Assert.NotEqual(Guid.Empty, packageGuid);
+        }
+
+        [Fact]
+        public async Task CreatePackage_PackageAppearsInProjectElements()
+        {
+            var (apiService, factory) = BuildServices();
+
+            var projectName = $"PackageElemTest-{Guid.NewGuid():N}";
+            var project = await apiService.CreateNewProjectAsync(projectName, "");
+            var projectGuid = project?.Id ?? throw new Exception("project not created");
+
+            var packageName = "VerifyPackage";
+            await factory.CreatePackage(projectGuid, packageName);
+
+            // Get the default branch head commit
+            var branches = await apiService.GetBranchesAsync(projectGuid);
+            var defaultBranch = branches.FirstOrDefault()
+                ?? throw new Exception("No branch found");
+            var headCommitId = defaultBranch.Head?.Id
+                ?? throw new Exception("No head commit");
+
+            var elements = await apiService.GetElementsAsync(projectGuid, headCommitId);
+            Assert.NotNull(elements);
+            Assert.Contains(elements, e =>
+                string.Equals(e.GetName(), packageName, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(e.Type, "Package", StringComparison.OrdinalIgnoreCase));
+        }
     }
-    
 }

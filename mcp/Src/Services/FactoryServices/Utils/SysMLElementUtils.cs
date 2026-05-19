@@ -1,19 +1,12 @@
 
-using Org.OpenAPITools.Model;
+using SysMLV2.MCP.Models;
 
 namespace mcp.Src.Services.FactoryServices.Utils;
 
-
 public static class SysMLElementUtils
 {
-
-
-    public static string GetName(this Element element)
+    public static string GetName(this SysMLElement element)
     {
-        var nameKeyValuePair = element.AdditionalProperties.FirstOrDefault(prop => prop.Key == "name");
-        return nameKeyValuePair.Value.GetString() ?? "N/A";
+        return element.GetName();
     }
-    
-
-
 }
