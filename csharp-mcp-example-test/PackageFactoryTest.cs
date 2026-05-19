@@ -6,6 +6,11 @@ using Microsoft.Extensions.Logging;
 
 namespace mcp.Src.Services.FactoryServices.Tests
 {
+    /// <summary>
+    /// Integration tests for <see cref="SysMLPackageFactory"/>.
+    /// These tests require a running SysML v2 API server on localhost:9000.
+    /// Run them with: dotnet test --filter "Category=Integration"
+    /// </summary>
     public class SysMLPackageFactoryTest
     {
         private static (SysMLApiService apiService, SysMLPackageFactory factory) BuildServices()
@@ -35,6 +40,7 @@ namespace mcp.Src.Services.FactoryServices.Tests
         }
 
         [Fact]
+        [Trait("Category", "Integration")]
         public async Task CreatePackage_CreatesPackageInProject()
         {
             var (apiService, factory) = BuildServices();
@@ -49,6 +55,7 @@ namespace mcp.Src.Services.FactoryServices.Tests
         }
 
         [Fact]
+        [Trait("Category", "Integration")]
         public async Task CreatePackage_PackageAppearsInProjectElements()
         {
             var (apiService, factory) = BuildServices();

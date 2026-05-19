@@ -55,6 +55,7 @@ jobs:
     - name: Test with detailed reporting
       run: |
         dotnet test --no-build --verbosity normal \
+          --filter "Category!=Integration" \
           --logger "trx;LogFileName=test-results.trx" \
           --logger "console;verbosity=detailed" \
           --collect:"XPlat Code Coverage" \
