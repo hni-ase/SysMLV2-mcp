@@ -1,4 +1,4 @@
-# csharp-mcp-example
+# SysMLV2-MCP
 
 This repository contains a C# Model Context Protocol (MCP) server for working with SysML v2 models and related services.
 
