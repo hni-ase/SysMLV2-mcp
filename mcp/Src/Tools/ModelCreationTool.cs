@@ -189,10 +189,24 @@ public class ModelCreationTools
         };
     }
 
-    [McpServerTool, Description("Creates a new use case in the specified project.")]
-    public static UseCaseLLMInformation CreateUseCase(string name, string documentation, string precondition)
+    [McpServerTool, Description("Creates a UseCaseUsage element in the specified project. Optionally links an objective RequirementUsage and nests under a parent package.")]
+    public static UseCaseLLMInformation CreateUseCase(
+        McpServer server,
+        string projectName,
+        string useCaseName,
+        Guid objectiveRequirementId = default,
+        Guid parentPackageGuid = default)
     {
-        throw new NotImplementedException();
+        var apiService = RequireApiService(server);
+        var project = FindProjectByName(apiService, projectName);
+        var factory = new SysMLUseCaseFactory(apiService);
+        var (elementId, projectId) = factory.CreateUseCase(
+            project.Id!.Value,
+            useCaseName,
+            objectiveRequirementId,
+            parentPackageGuid)
+            .GetAwaiter().GetResult();
+        return new UseCaseLLMInformation(elementId, projectId, useCaseName);
     }
 
     [McpServerTool, Description("Creates a new actor in the specified project.")]
@@ -242,6 +256,40 @@ public class ModelCreationTools
             reqId,
             isAbstract,
             parentPackageGuid)
+            .GetAwaiter().GetResult();
+    }
+
+    [McpServerTool, Description("Adds a subject parameter (SubjectMembership + ReferenceUsage) to an existing RequirementUsage or RequirementDefinition. Returns the element ID of the created subject ReferenceUsage.")]
+    public static Guid AddSubjectToRequirement(
+        McpServer server,
+        string projectName,
+        Guid requirementId,
+        string subjectName)
+    {
+        var apiService = RequireApiService(server);
+        var project = FindProjectByName(apiService, projectName);
+        var factory = new SysMLRequirementFactory(apiService);
+        return factory.AddSubjectToRequirement(
+            project.Id!.Value,
+            requirementId,
+            subjectName)
+            .GetAwaiter().GetResult();
+    }
+
+    [McpServerTool, Description("Types a RequirementUsage against a RequirementDefinition by setting the requirementDefinition field. Fetches the current element state and re-commits with the updated field.")]
+    public static void SetRequirementDefinition(
+        McpServer server,
+        string projectName,
+        Guid requirementUsageId,
+        Guid requirementDefinitionId)
+    {
+        var apiService = RequireApiService(server);
+        var project = FindProjectByName(apiService, projectName);
+        var factory = new SysMLRequirementFactory(apiService);
+        factory.SetRequirementDefinition(
+            project.Id!.Value,
+            requirementUsageId,
+            requirementDefinitionId)
             .GetAwaiter().GetResult();
     }
 
