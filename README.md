@@ -46,6 +46,12 @@ All tools are defined in [mcp/Src/Tools/ModelCreationTool.cs](mcp/Src/Tools/Mode
 | `CreateRequirement` | Creates a `RequirementUsage` element, optionally nested under a parent package. |
 | `CreateRequirementDefinition` | Creates a `RequirementDefinition` element with optional `isAbstract` flag. |
 | `CreateUseCase` | Creates a `UseCaseUsage` element, optionally linked to an objective requirement. |
+| `CreateSignalDefinition` | Creates a signal definition (mapped to `ItemDefinition`), optionally nested under a parent element. |
+| `CreateSignal` | Creates a signal usage (mapped to `ItemUsage`), optionally nested under a parent element. |
+| `CreateBlockDefinition` | Creates a block definition (mapped to `PartDefinition`), optionally nested under a parent element. |
+| `CreatePart` | Creates a part/block usage (mapped to `PartUsage`), optionally nested under a parent element. |
+| `CreateInterfaceDefinition` | Creates an `InterfaceDefinition`, optionally nested under a parent element. |
+| `CreateInterface` | Creates an `InterfaceUsage`, optionally nested under a parent element. |
 | `CreateElementOfType` | Generic tool — creates any SysML v2 element type given a JSON attributes payload. Invalid schema attributes are reported and skipped rather than causing an error. |
 
 ### Element modification
@@ -53,6 +59,12 @@ All tools are defined in [mcp/Src/Tools/ModelCreationTool.cs](mcp/Src/Tools/Mode
 | Tool | Description |
 |---|---|
 | `UpdateElementAttributes` | Overwrites specific attributes on an existing element while preserving all others. Accepts a JSON object string for the attribute patch. |
+| `UpdateSignalDefinition` | Updates attributes on a signal definition (mapped to `ItemDefinition`). |
+| `UpdateSignal` | Updates attributes on a signal usage (mapped to `ItemUsage`). |
+| `UpdateBlockDefinition` | Updates attributes on a block definition (mapped to `PartDefinition`). |
+| `UpdatePart` | Updates attributes on a part/block usage (mapped to `PartUsage`). |
+| `UpdateInterfaceDefinition` | Updates attributes on an `InterfaceDefinition`. |
+| `UpdateInterface` | Updates attributes on an `InterfaceUsage`. |
 | `AddSubjectToRequirement` | Adds a `SubjectMembership` + `ReferenceUsage` (subject parameter) to an existing requirement. |
 | `SetRequirementDefinition` | Types a `RequirementUsage` against a `RequirementDefinition` by setting the `requirementDefinition` reference field. |
 
@@ -126,4 +138,3 @@ These steps use the built-in VS Code C#/.NET tooling to run and test the MCP ser
 3. Press **F5** to run with the debugger, or use **Run > Start Debugging**.
 	- If prompted to select an environment, choose the default .NET configuration.
 4. Confirm the server is running in the VS Code Debug Console/Terminal output.
-

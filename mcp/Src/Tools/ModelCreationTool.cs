@@ -259,6 +259,126 @@ public class ModelCreationTools
             .GetAwaiter().GetResult();
     }
 
+    [McpServerTool, Description("Creates a signal definition element in the specified project. SysML v2 metamodel mapping: SignalDefinition -> ItemDefinition.")]
+    public static ElementCreationResult CreateSignalDefinition(
+        McpServer server,
+        string projectName,
+        string signalName,
+        string? parentElementId = null)
+    {
+        return CreateNamedElementOfType(server, projectName, "ItemDefinition", signalName, parentElementId);
+    }
+
+    [McpServerTool, Description("Creates a signal usage element in the specified project. SysML v2 metamodel mapping: SignalUsage -> ItemUsage.")]
+    public static ElementCreationResult CreateSignal(
+        McpServer server,
+        string projectName,
+        string signalName,
+        string? parentElementId = null)
+    {
+        return CreateNamedElementOfType(server, projectName, "ItemUsage", signalName, parentElementId);
+    }
+
+    [McpServerTool, Description("Creates a block definition element in the specified project. SysML v2 metamodel mapping: BlockDefinition -> PartDefinition.")]
+    public static ElementCreationResult CreateBlockDefinition(
+        McpServer server,
+        string projectName,
+        string blockDefinitionName,
+        string? parentElementId = null)
+    {
+        return CreateNamedElementOfType(server, projectName, "PartDefinition", blockDefinitionName, parentElementId);
+    }
+
+    [McpServerTool, Description("Creates a part/block usage element in the specified project. SysML v2 metamodel mapping: BlockPart -> PartUsage.")]
+    public static ElementCreationResult CreatePart(
+        McpServer server,
+        string projectName,
+        string partName,
+        string? parentElementId = null)
+    {
+        return CreateNamedElementOfType(server, projectName, "PartUsage", partName, parentElementId);
+    }
+
+    [McpServerTool, Description("Creates an interface definition element in the specified project.")]
+    public static ElementCreationResult CreateInterfaceDefinition(
+        McpServer server,
+        string projectName,
+        string interfaceDefinitionName,
+        string? parentElementId = null)
+    {
+        return CreateNamedElementOfType(server, projectName, "InterfaceDefinition", interfaceDefinitionName, parentElementId);
+    }
+
+    [McpServerTool, Description("Creates an interface usage element in the specified project.")]
+    public static ElementCreationResult CreateInterface(
+        McpServer server,
+        string projectName,
+        string interfaceName,
+        string? parentElementId = null)
+    {
+        return CreateNamedElementOfType(server, projectName, "InterfaceUsage", interfaceName, parentElementId);
+    }
+
+    [McpServerTool, Description("Updates attributes of a signal definition element (mapped to ItemDefinition) in the specified project.")]
+    public static ElementUpdateResult UpdateSignalDefinition(
+        McpServer server,
+        string projectName,
+        Guid signalDefinitionId,
+        string attributesJson)
+    {
+        return UpdateElementAttributes(server, projectName, signalDefinitionId, attributesJson);
+    }
+
+    [McpServerTool, Description("Updates attributes of a signal usage element (mapped to ItemUsage) in the specified project.")]
+    public static ElementUpdateResult UpdateSignal(
+        McpServer server,
+        string projectName,
+        Guid signalId,
+        string attributesJson)
+    {
+        return UpdateElementAttributes(server, projectName, signalId, attributesJson);
+    }
+
+    [McpServerTool, Description("Updates attributes of a block definition element (mapped to PartDefinition) in the specified project.")]
+    public static ElementUpdateResult UpdateBlockDefinition(
+        McpServer server,
+        string projectName,
+        Guid blockDefinitionId,
+        string attributesJson)
+    {
+        return UpdateElementAttributes(server, projectName, blockDefinitionId, attributesJson);
+    }
+
+    [McpServerTool, Description("Updates attributes of a part/block usage element (mapped to PartUsage) in the specified project.")]
+    public static ElementUpdateResult UpdatePart(
+        McpServer server,
+        string projectName,
+        Guid partId,
+        string attributesJson)
+    {
+        return UpdateElementAttributes(server, projectName, partId, attributesJson);
+    }
+
+    [McpServerTool, Description("Updates attributes of an interface definition element in the specified project.")]
+    public static ElementUpdateResult UpdateInterfaceDefinition(
+        McpServer server,
+        string projectName,
+        Guid interfaceDefinitionId,
+        string attributesJson)
+    {
+        return UpdateElementAttributes(server, projectName, interfaceDefinitionId, attributesJson);
+    }
+
+    [McpServerTool, Description("Updates attributes of an interface usage element in the specified project.")]
+    public static ElementUpdateResult UpdateInterface(
+        McpServer server,
+        string projectName,
+        Guid interfaceId,
+        string attributesJson)
+    {
+        return UpdateElementAttributes(server, projectName, interfaceId, attributesJson);
+    }
+
     [McpServerTool, Description("Adds a subject parameter (SubjectMembership + ReferenceUsage) to an existing RequirementUsage or RequirementDefinition. Returns the element ID of the created subject ReferenceUsage.")]
     public static Guid AddSubjectToRequirement(
         McpServer server,
@@ -568,6 +688,22 @@ public class ModelCreationTools
         return (projectId, headCommitId);
     }
 
+    private static ElementCreationResult CreateNamedElementOfType(
+        McpServer server,
+        string projectName,
+        string elementType,
+        string elementName,
+        string? parentElementId = null)
+    {
+        var attributesJson = JsonSerializer.Serialize(new Dictionary<string, object?>
+        {
+            ["name"] = elementName,
+            ["declaredName"] = elementName
+        });
+
+        return CreateElementOfType(server, projectName, elementType, attributesJson, parentElementId);
+    }
+
     public class ProjectLookupResult
     {
         public Guid Id { get; set; }
@@ -586,4 +722,3 @@ public class ModelCreationTools
         public string? OwningMembershipId { get; set; }
     }
 }
-
