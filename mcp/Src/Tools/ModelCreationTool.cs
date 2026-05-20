@@ -289,7 +289,7 @@ public class ModelCreationTools
         return CreateNamedElementOfType(server, projectName, "PartDefinition", blockDefinitionName, parentElementId);
     }
 
-    [McpServerTool, Description("Creates a part/block usage element in the specified project. SysML v2 metamodel mapping: BlockPart -> PartUsage.")]
+    [McpServerTool, Description("Creates a part/block usage element in the specified project. SysML v2 metamodel mapping: BlockUsage -> PartUsage.")]
     public static ElementCreationResult CreatePart(
         McpServer server,
         string projectName,
