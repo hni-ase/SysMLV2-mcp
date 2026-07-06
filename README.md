@@ -2,9 +2,23 @@
 
 This repository contains a C# Model Context Protocol (MCP) server for working with SysML v2 models and related services.
 
-✅ **Research note**: The paper describing this framework has been accepted to the **DESIGN 2026** conference.
+## Citation
 
-The bibtex entry to cite this paper is coming soon. b
+If you use this repository in your research or projects, please cite the following paper:
+
+> Bazzal, M., Schleifer, S., Lungu, A., Kruse, B., Goetz, S., Koldewey, C., Tissen, D., Wartzack, S. J., & Dumitrescu, R. (2026). Model context protocol for MBSE: a unified interoperable agentic framework for systems modelling. *Proceedings of the Design Society*, 6, 2721–2730. https://doi.org/10.1017/pds.2026.10630
+
+```bibtex
+@article{Bazzal_Schleifer_Lungu_Kruse_Goetz_Koldewey_Tissen_Wartzack_Dumitrescu_2026,
+  title   = {Model context protocol for MBSE: a unified interoperable agentic framework for systems modelling},
+  volume  = {6},
+  DOI     = {10.1017/pds.2026.10630},
+  journal = {Proceedings of the Design Society},
+  author  = {Bazzal, Mahmoud and Schleifer, Simon and Lungu, Adriana and Kruse, Benjamin and Goetz, Stefan and Koldewey, Christian and Tissen, Denis and Wartzack, Sandro J. and Dumitrescu, Roman},
+  year    = {2026},
+  pages   = {2721–2730}
+}
+```
 
 📄 **License**: This repository is licensed under the **MIT License**.
 
