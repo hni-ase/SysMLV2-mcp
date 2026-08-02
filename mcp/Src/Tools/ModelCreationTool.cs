@@ -18,47 +18,6 @@ public class ModelCreationTools
     }
 
 
-    [McpServerTool, Description("Creates a new SysML V2 model in the specified project.")]
-    public static string CreateProject(McpServer server, string projectName)
-    {
-        Debug.WriteLine("Model Creation Tool is handling operation...");
-        var sysMLApiService = RequireApiService(server);
-        var result = sysMLApiService.CreateNewProjectAsync(projectName, "Created via MCP Tool").GetAwaiter().GetResult();
-        return string.Format("Project '{0}' created successfully with ID: {1}.", projectName, result.Id);
-    }
-
-    [McpServerTool, Description("Gets all SysML V2 projects from localhost:9000.")]
-    public static List<ProjectLookupResult> GetProjects(McpServer server)
-    {
-        var apiService = RequireApiService(server);
-        return apiService
-            .GetProjects()
-            .GetAwaiter()
-            .GetResult()
-            .Select(project => new ProjectLookupResult
-            {
-                Id = project.Id ?? Guid.Empty,
-                Name = project.Name ?? string.Empty,
-                DefaultBranchId = project.DefaultBranch?.Id ?? Guid.Empty,
-                Description = project.Description ?? string.Empty
-            })
-            .ToList();
-    }
-
-    [McpServerTool, Description("Gets a SysML V2 project by name from localhost:9000.")]
-    public static ProjectLookupResult GetProjectByName(McpServer server, string projectName)
-    {
-        var apiService = RequireApiService(server);
-        var project = FindProjectByName(apiService, projectName);
-        return new ProjectLookupResult
-        {
-            Id = project.Id ?? Guid.Empty,
-            Name = project.Name ?? string.Empty,
-            DefaultBranchId = project.DefaultBranch?.Id ?? Guid.Empty,
-            Description = project.Description ?? string.Empty
-        };
-    }
-
     [McpServerTool, Description("Creates a new SysML V2 element in the specified project.")]
     public static string CreateElement(string elementName)
     {
