@@ -24,19 +24,25 @@ runs the same build + filtered test commands.
 ## Repository layout
 
 ```
-mcp/                          ← MCP server (ASP.NET Core, net9.0)
+mcp/                          ← MCP server + shared tool library (SysMLv2Mcp.Tools.csproj)
 └── Src/
-    ├── Program.cs            ← host composition root (DI + transport)
+    ├── Program.cs            ← all-tools host composition root (DI + stdio transport)
     ├── Tools/
-    │   ├── ModelCreationTool.cs   ← current home of all [McpServerTool] methods
-    │   ├── AbstractTool.cs        ← base class for tool sets (under-used)
-    │   └── Creation/             ← newer, per-domain tool layout (WIP)
+    │   ├── ModelCreationTool.cs   ← current home of remaining static [McpServerTool] methods
+    │   ├── AbstractTool.cs        ← deprecated base class for tool sets
+    │   ├── Projects/              ← stateless instance tool classes (migration target)
+    │   │   └── ProjectTools.cs
+    │   └── Creation/             ← earlier per-domain WIP layout (being replaced)
     ├── Services/
     │   ├── ISysMLApiService.cs / SysMLApiService.cs   ← HTTP client to :9000
     │   └── FactoryServices/      ← domain factories (package, requirement, …)
     ├── Models/                  ← DTOs returned to the LLM
     └── Resources/               ← embedded resources
-csharp-mcp-example-test/      ← xUnit tests (now test/SysMLv2Mcp.Tests/)
+Hosts/                        ← per-domain thin MCP server hosts
+└── Projects/                 ← SysMLv2Mcp.Projects.csproj (mounts only ProjectTools)
+    └── Program.cs
+test/SysMLv2Mcp.Tests/        ← xUnit tests (SysMLv2Mcp.Tests.csproj)
+SysMLv2Mcp.sln               ← solution (mcp + Hosts/Projects + test)
 sysmlv2-api-spec/             ← SysML v2 metamodel JSON used by schema tools
 sysml-v2-client/              ← generated API client
 ```
@@ -205,7 +211,7 @@ We adopt **Pattern 1: Stateless tools + DI services**.
 flowchart TD
     Client[Agent / MCP client]
 
-    subgraph Host["mcp/  (single host, stdio)"]
+    subgraph Host["mcp/  (SysMLv2Mcp.Tools.csproj, single host, stdio)"]
         Prog["Program.cs<br/>AddMcpServer().WithToolsFromAssembly()<br/>.WithStdioServerTransport()"]
 
         subgraph Tools["Tools/  (static, stateful)"]
@@ -241,7 +247,7 @@ container.
 flowchart TD
     Client[Agent / MCP client<br/>mounts several servers]
 
-    subgraph Lib["mcp/Src/  (shared tool library, one DLL)"]
+    subgraph Lib["mcp/Src/  (shared tool library, SysMLv2Mcp.Tools.csproj)"]
         subgraph TLib["Tools/&lt;Domain&gt;/  (instance, stateless)"]
             PT["ProjectTools<br/>ctor(ISysMLApiService)"]
             PkgT["PackageTools<br/>ctor(api, factory)"]
@@ -257,7 +263,7 @@ flowchart TD
         TLib --> Svc2
     end
 
-    subgraph HostAll["Hosts/All  (mcp/Program.cs)"]
+    subgraph HostAll["all-tools host  (mcp/Program.cs)"]
         PA["Program.cs<br/>.WithToolsFromAssembly()<br/>(every tool class)"]
         PA --> TLib
         PA --> Svc2
@@ -280,14 +286,14 @@ flowchart TD
     Api2 -->|HTTP| Backend2["SysML v2 backend :9000"]
 ```
 
-**Why this scales to ~400 tools**: the same tool library DLL is mounted by
-many thin host processes, each exposing only its domain's tool class via
-the explicit `WithTools(IEnumerable<Type>)` overload. The agent mounts the
-servers it needs for a task, so its per-call tool menu stays ~40, not
-400. Tool code is authored once; adding a host is a ~20-line `Program.cs`
-+ a csproj that references the library. Swapping
-`WithStdioServerTransport()` for HTTP/SSE later touches only each
-host's `Program.cs`, never the tool classes.
+**Why this scales to ~400 tools**: the same tool library (`SysMLv2Mcp.Tools.csproj`)
+is mounted by many thin host processes, each exposing only its domain's
+tool class via the explicit `WithTools(IEnumerable<Type>)` overload. The
+agent mounts the servers it needs for a task, so its per-call tool menu
+stays ~40, not 400. Tool code is authored once; adding a host is a ~20-line
+`Program.cs` + a csproj that references `SysMLv2Mcp.Tools.csproj`. Swapping
+`WithStdioServerTransport()` for HTTP/SSE later touches only each host's
+`Program.cs`, never the tool classes.
 
 ### Dependency injection flow for a stateless tool
 
@@ -343,7 +349,7 @@ flowchart LR
 ```mermaid
 pie title Tool domains migrated to stateless instance classes
     "Migrated (ProjectTools)" : 1
-    "Remaining static methods on ModelCreationTools" : 9
+    "Remaining (9 domains, 32 static methods)" : 9
 ```
 
 Migration order per AGENTS.md §"Migration order":
