@@ -344,14 +344,6 @@ flowchart LR
     Tool -. "review rejects" .-> F4
 ```
 
-### Migration progress (state at this branch)
-
-```mermaid
-pie title Tool domains migrated to stateless instance classes
-    "Migrated (ProjectTools)" : 1
-    "Remaining (9 domains, 32 static methods)" : 9
-```
-
 Migration order per AGENTS.md §"Migration order":
 projects ✅ → schema → element query → packages → requirements →
 use cases → signals → blocks → interfaces → mutations.
