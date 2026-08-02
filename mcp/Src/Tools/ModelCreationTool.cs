@@ -57,50 +57,6 @@ public class ModelCreationTools
         throw new NotImplementedException();
     }
 
-    [McpServerTool, Description("Creates a RequirementUsage element in the specified project. Optionally nested under a parent package.")]
-    public static Guid CreateRequirement(
-        McpServer server,
-        string projectName,
-        string requirementName,
-        string requirementText,
-        string? reqId = null,
-        Guid parentPackageGuid = default)
-    {
-        var apiService = RequireApiService(server);
-        var project = FindProjectByName(apiService, projectName);
-        var factory = new SysMLRequirementFactory(apiService);
-        return factory.CreateRequirement(
-            project.Id!.Value,
-            requirementName,
-            requirementText,
-            reqId,
-            parentPackageGuid)
-            .GetAwaiter().GetResult();
-    }
-
-    [McpServerTool, Description("Creates a RequirementDefinition element in the specified project. Optionally nested under a parent package.")]
-    public static Guid CreateRequirementDefinition(
-        McpServer server,
-        string projectName,
-        string definitionName,
-        string definitionText,
-        string? reqId = null,
-        bool isAbstract = false,
-        Guid parentPackageGuid = default)
-    {
-        var apiService = RequireApiService(server);
-        var project = FindProjectByName(apiService, projectName);
-        var factory = new SysMLRequirementFactory(apiService);
-        return factory.CreateRequirementDefinition(
-            project.Id!.Value,
-            definitionName,
-            definitionText,
-            reqId,
-            isAbstract,
-            parentPackageGuid)
-            .GetAwaiter().GetResult();
-    }
-
     [McpServerTool, Description("Creates a signal definition element in the specified project. SysML v2 metamodel mapping: SignalDefinition -> ItemDefinition.")]
     public static ElementCreationResult CreateSignalDefinition(
         McpServer server,
@@ -219,40 +175,6 @@ public class ModelCreationTools
         string attributesJson)
     {
         return UpdateElementAttributes(server, projectName, interfaceId, attributesJson);
-    }
-
-    [McpServerTool, Description("Adds a subject parameter (SubjectMembership + ReferenceUsage) to an existing RequirementUsage or RequirementDefinition. Returns the element ID of the created subject ReferenceUsage.")]
-    public static Guid AddSubjectToRequirement(
-        McpServer server,
-        string projectName,
-        Guid requirementId,
-        string subjectName)
-    {
-        var apiService = RequireApiService(server);
-        var project = FindProjectByName(apiService, projectName);
-        var factory = new SysMLRequirementFactory(apiService);
-        return factory.AddSubjectToRequirement(
-            project.Id!.Value,
-            requirementId,
-            subjectName)
-            .GetAwaiter().GetResult();
-    }
-
-    [McpServerTool, Description("Types a RequirementUsage against a RequirementDefinition by setting the requirementDefinition field. Fetches the current element state and re-commits with the updated field.")]
-    public static void SetRequirementDefinition(
-        McpServer server,
-        string projectName,
-        Guid requirementUsageId,
-        Guid requirementDefinitionId)
-    {
-        var apiService = RequireApiService(server);
-        var project = FindProjectByName(apiService, projectName);
-        var factory = new SysMLRequirementFactory(apiService);
-        factory.SetRequirementDefinition(
-            project.Id!.Value,
-            requirementUsageId,
-            requirementDefinitionId)
-            .GetAwaiter().GetResult();
     }
 
     [McpServerTool, Description("Updates specific attributes on an existing SysML V2 element. Pass attributesJson as a JSON object string, e.g. {\"name\":\"NewName\",\"reqId\":\"REQ-002\"}. The element @type and all current attribute values are preserved; only the supplied attributes are overwritten. Attributes that do not exist in the element's schema are reported as invalid and skipped — no error is thrown.")]

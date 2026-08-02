@@ -37,6 +37,7 @@ builder.Services.AddSingleton(new SysMLMetaModelFactory(ResolveSchemasPath(build
 // Stateless services used by the migrated instance tool classes
 builder.Services.AddSingleton<ProjectContextResolver>();
 builder.Services.AddSingleton<SysMLPackageFactory>();
+builder.Services.AddSingleton<SysMLRequirementFactory>();
 
 
 await builder.Build().RunAsync();

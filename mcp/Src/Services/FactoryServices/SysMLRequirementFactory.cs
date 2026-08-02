@@ -23,7 +23,7 @@ public class SysMLRequirementFactory
     /// <param name="reqId">Optional short requirement identifier (e.g. "REQ-001").</param>
     /// <param name="ownerPackageGuid">Optional parent package to nest this requirement under.</param>
     /// <returns>The element ID of the created RequirementUsage.</returns>
-    public async Task<Guid> CreateRequirement(
+    public virtual async Task<Guid> CreateRequirement(
         Guid projectId,
         string requirementName,
         string requirementText,
@@ -99,7 +99,7 @@ public class SysMLRequirementFactory
     /// <param name="isAbstract">Whether the definition is abstract.</param>
     /// <param name="ownerPackageGuid">Optional parent package to nest this definition under.</param>
     /// <returns>The element ID of the created RequirementDefinition.</returns>
-    public async Task<Guid> CreateRequirementDefinition(
+    public virtual async Task<Guid> CreateRequirementDefinition(
         Guid projectId,
         string definitionName,
         string definitionText,
@@ -173,7 +173,7 @@ public class SysMLRequirementFactory
     /// RequirementDefinition element. Reads the current element state, overrides the field,
     /// and submits a new commit.
     /// </summary>
-    public async Task SetRequirementDefinition(
+    public virtual async Task SetRequirementDefinition(
         Guid projectId,
         Guid requirementId,
         Guid definitionId)
@@ -224,7 +224,7 @@ public class SysMLRequirementFactory
     /// <param name="requirementId">The requirement element to add the subject to.</param>
     /// <param name="subjectName">The name of the subject (e.g. "vehicle").</param>
     /// <returns>The element ID of the created ReferenceUsage subject parameter.</returns>
-    public async Task<Guid> AddSubjectToRequirement(
+    public virtual async Task<Guid> AddSubjectToRequirement(
         Guid projectId,
         Guid requirementId,
         string subjectName)
