@@ -2,7 +2,7 @@ using System.ComponentModel;
 using mcp.Src.Services;
 using SysMLV2.MCP.Models;
 
-namespace csharp_mcp_example_test;
+namespace SysMLv2Mcp.Tests;
 
 public class ModelCreationToolsSurfaceTests
 {
@@ -50,5 +50,5 @@ public class ModelCreationToolsSurfaceTests
     }
 
     private static string GetSysMlSchemasPath() =>
-        Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
+        Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
 }

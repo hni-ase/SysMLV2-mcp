@@ -36,7 +36,7 @@ mcp/                          ← MCP server (ASP.NET Core, net9.0)
     │   └── FactoryServices/      ← domain factories (package, requirement, …)
     ├── Models/                  ← DTOs returned to the LLM
     └── Resources/               ← embedded resources
-csharp-mcp-example-test/      ← xUnit tests
+csharp-mcp-example-test/      ← xUnit tests (now test/SysMLv2Mcp.Tests/)
 sysmlv2-api-spec/             ← SysML v2 metamodel JSON used by schema tools
 sysml-v2-client/              ← generated API client
 ```
@@ -174,7 +174,7 @@ We adopt **Pattern 1: Stateless tools + DI services**.
   DTOs. `RootNamespace` in the csproj is `SysMLV2.MCP`.
 - **Descriptions on `[McpServerTool]`** are mandatory and written for an
   LLM reader — one sentence, no jargon that assumes SysML expertise.
-- **Tests**: add to `csharp-mcp-example-test/` following
+- **Tests**: add to `test/SysMLv2Mcp.Tests/` following
   `SysMLOpenApiFactoryTests.cs` / `ModelCreationToolsSurfaceTests.cs`.
   Integration tests that need `:9000` are tagged `Category=Integration` and
   excluded from CI.

@@ -27,7 +27,7 @@ namespace mcp.Src.Services.FactoryServices.Tests
                     });
 
                     var schemasPath = Path.Combine(Directory.GetCurrentDirectory(),
-                        "..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
+                        "..", "..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
                     services.AddSingleton(new SysMLMetaModelFactory(schemasPath));
                 })
                 .Build();

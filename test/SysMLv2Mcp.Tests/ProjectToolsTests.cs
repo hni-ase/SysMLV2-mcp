@@ -5,7 +5,7 @@ using Src.Services;
 using SysMLV2.MCP.Models;
 using Tools.Projects;
 
-namespace csharp_mcp_example_test;
+namespace SysMLv2Mcp.Tests;
 
 public class ProjectToolsTests
 {
