@@ -194,3 +194,158 @@ We adopt **Pattern 1: Stateless tools + DI services**.
 | Per-request state in tools | implicit (via `server`) | none — all in parameters |
 | Transport | stdio only | stdio now; HTTP/SSE-ready |
 | `AbstractToolSet` | present, unused | removed |
+
+---
+
+## Architecture diagrams
+
+### Current (stateful tool layer)
+
+```mermaid
+flowchart TD
+    Client[Agent / MCP client]
+
+    subgraph Host["mcp/  (single host, stdio)"]
+        Prog["Program.cs<br/>AddMcpServer().WithToolsFromAssembly()<br/>.WithStdioServerTransport()"]
+
+        subgraph Tools["Tools/  (static, stateful)"]
+            MCT["ModelCreationTools<br/>~40 static [McpServerTool] methods"]
+            MCT -. "each method takes<br/>McpServer server" .-> SL["RequireApiService(server)<br/>RequireMetaModelFactory(server)<br/>server.Services.GetService&lt;T&gt;()"]
+        end
+
+        subgraph Svc["Services/  (stateless singletons)"]
+            Api["ISysMLApiService<br/>HttpClient :9000"]
+            MMF["SysMLMetaModelFactory"]
+            Fact["FactoryServices/<br/>Package/Requirement/UseCase..."]
+        end
+
+        Prog --> Tools
+        SL --> Api
+        SL --> MMF
+        MCT --> Fact
+    end
+
+    Client -->|stdio| Prog
+    Api -->|HTTP| Backend["SysML v2 backend :9000"]
+```
+
+**Problem**: every tool reaches into `McpServer.Services` at call time
+(service locator), hides per-request state behind `server`, and is rebuilt
+per call (`new SysMLPackageFactory(apiService, metamodelFactory)` inside
+`CreatePackage`). Tools cannot be tested without an `McpServer` + DI
+container.
+
+### Target (stateless core + multi-host)
+
+```mermaid
+flowchart TD
+    Client[Agent / MCP client<br/>mounts several servers]
+
+    subgraph Lib["mcp/Src/  (shared tool library, one DLL)"]
+        subgraph TLib["Tools/&lt;Domain&gt;/  (instance, stateless)"]
+            PT["ProjectTools<br/>ctor(ISysMLApiService)"]
+            PkgT["PackageTools<br/>ctor(api, factory)"]
+            RT["RequirementTools<br/>ctor(api, factory)"]
+            OtherT["...one class per domain"]
+        end
+        subgraph Svc2["Services/  (stateless singletons)"]
+            Api2["ISysMLApiService"]
+            MMF2["SysMLMetaModelFactory"]
+            Fact2["FactoryServices/<br/>DI-owned singletons"]
+        end
+        Models["Models/<br/>ProjectLookupResult, ElementLookupResult, ..."]
+        TLib --> Svc2
+    end
+
+    subgraph HostAll["Hosts/All  (mcp/Program.cs)"]
+        PA["Program.cs<br/>.WithToolsFromAssembly()<br/>(every tool class)"]
+        PA --> TLib
+        PA --> Svc2
+    end
+
+    subgraph HostProj["Hosts/Projects  (Hosts/Projects/Program.cs)"]
+        PP["Program.cs<br/>.WithTools(new&#x005B;&#x005D;&#x007B;typeof(ProjectTools)&#x007D;)<br/>(one tool class only)"]
+        PP --> PT
+        PP --> Svc2
+    end
+
+    subgraph HostPkg["Hosts/Packages  (future)"]
+        Pkg["Program.cs<br/>.WithTools(typeof(PackageTools))"]
+        Pkg --> PkgT
+    end
+
+    Client -->|stdio| PA
+    Client -->|stdio| PP
+    Client -->|stdio| Pkg
+    Api2 -->|HTTP| Backend2["SysML v2 backend :9000"]
+```
+
+**Why this scales to ~400 tools**: the same tool library DLL is mounted by
+many thin host processes, each exposing only its domain's tool class via
+the explicit `WithTools(IEnumerable<Type>)` overload. The agent mounts the
+servers it needs for a task, so its per-call tool menu stays ~40, not
+400. Tool code is authored once; adding a host is a ~20-line `Program.cs`
++ a csproj that references the library. Swapping
+`WithStdioServerTransport()` for HTTP/SSE later touches only each
+host's `Program.cs`, never the tool classes.
+
+### Dependency injection flow for a stateless tool
+
+```mermaid
+sequenceDiagram
+    participant C as MCP client
+    participant H as Host Program.cs (DI)
+    participant T as ProjectTools (instance)
+    participant S as ISysMLApiService (singleton)
+    participant B as SysML backend :9000
+
+    Note over H: At startup: AddSingleton&lt;ISysMLApiService, SysMLApiService&gt;()
+    Note over H: AddMcpServer().WithTools(typeof(ProjectTools))
+    H->>S: resolve ISysMLApiService (once)
+    H->>T: new ProjectTools(api)  // constructor injection
+    Note over T: No McpServer param. No service locator. No per-request state.
+
+    C->>H: tools/call  GetProjectByName  {projectName:"Alpha"}
+    H->>T: invoke GetProjectByName("Alpha")
+    T->>S: api.GetProjects()
+    S->>B: GET /projects
+    B-->>S: 200 OK  [list]
+    S-->>T: Task&lt;List&lt;SysMLProject&gt;&gt;
+    T->>T: FirstOrDefault(p =&gt; p.Name == "Alpha")
+    T-->>H: ProjectLookupResult
+    H-->>C: JSON result
+```
+
+### Stateless-core rules (enforced by the type system)
+
+```mermaid
+flowchart LR
+    subgraph Allowed
+        A1["constructor params<br/>(ISysMLApiService, factories)"]
+        A2["method params<br/>(projectName, elementId, attributesJson)"]
+        A3["call injected services"]
+    end
+    subgraph Forbidden
+        F1["McpServer parameter"]
+        F2["server.Services.GetService&lt;T&gt;()"]
+        F3["static mutable state"]
+        F4["new Factory(api) inside a tool"]
+    end
+    Tool["Tool method"] --> Allowed
+    Tool -. "compiler rejects" .-> F1
+    Tool -. "code review rejects" .-> F2
+    Tool -. "compiler rejects" .-> F3
+    Tool -. "review rejects" .-> F4
+```
+
+### Migration progress (state at this branch)
+
+```mermaid
+pie title Tool domains migrated to stateless instance classes
+    "Migrated (ProjectTools)" : 1
+    "Remaining static methods on ModelCreationTools" : 9
+```
+
+Migration order per AGENTS.md §"Migration order":
+projects ✅ → schema → element query → packages → requirements →
+use cases → signals → blocks → interfaces → mutations.
