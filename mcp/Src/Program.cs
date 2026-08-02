@@ -1,4 +1,5 @@
 using mcp.Src.Services;
+using MCP.Src.Services.FactoryServices;
 using Microsoft.Extensions.DependencyInjection;
 using Src.Services;
 using System.IO;
@@ -32,6 +33,10 @@ builder.Services.AddHttpClient(
 builder.Services.AddSingleton<ISysMLApiService, SysMLApiService>();
 // Now we need to bind the SysML meta model service
 builder.Services.AddSingleton(new SysMLMetaModelFactory(ResolveSchemasPath(builder.Environment.ContentRootPath)));
+
+// Stateless services used by the migrated instance tool classes
+builder.Services.AddSingleton<ProjectContextResolver>();
+builder.Services.AddSingleton<SysMLPackageFactory>();
 
 
 await builder.Build().RunAsync();
