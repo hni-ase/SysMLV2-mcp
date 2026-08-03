@@ -21,9 +21,5 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 # Install Node.js LTS and TypeScript
 RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && nvm install --lts && nvm use --lts && npm install -g typescript" 2>&1
 
-# Install .NET global tools that might be useful
-RUN dotnet tool install --global dotnet-ef
-RUN dotnet tool install --global dotnet-aspnet-codegenerator
-
-# Add dotnet tools to PATH
+# Add dotnet tools to PATH (in case any are installed later via 'dotnet tool install')
 ENV PATH="$PATH:/home/vscode/.dotnet/tools"
