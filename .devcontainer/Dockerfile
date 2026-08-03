@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/dotnet:1-8.0-bookworm
+FROM mcr.microsoft.com/devcontainers/dotnet:1-9.0-bookworm
 
 # Install PostgreSQL client tools and Java
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
