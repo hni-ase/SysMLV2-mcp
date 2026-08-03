@@ -11,16 +11,36 @@ public class RequirementTools
 {
     private readonly ISysMLApiService _api;
     private readonly SysMLRequirementFactory _factory;
+    private readonly SysMLUseCaseFactory _useCaseFactory;
     private readonly ProjectContextResolver _projectContext;
 
     public RequirementTools(
         ISysMLApiService api,
         SysMLRequirementFactory factory,
+        SysMLUseCaseFactory useCaseFactory,
         ProjectContextResolver projectContext)
     {
         _api = api;
         _factory = factory;
+        _useCaseFactory = useCaseFactory;
         _projectContext = projectContext;
+    }
+
+    [McpServerTool, Description("Creates a UseCaseUsage element in the specified project. Optionally links an objective RequirementUsage and nests under a parent package.")]
+    public UseCaseLLMInformation CreateUseCase(
+        string projectName,
+        string useCaseName,
+        Guid objectiveRequirementId = default,
+        Guid parentPackageGuid = default)
+    {
+        var project = _projectContext.FindProjectByName(projectName);
+        var (elementId, projectId) = _useCaseFactory.CreateUseCase(
+            project.Id!.Value,
+            useCaseName,
+            objectiveRequirementId,
+            parentPackageGuid)
+            .GetAwaiter().GetResult();
+        return new UseCaseLLMInformation(elementId, projectId, useCaseName);
     }
 
     [McpServerTool, Description("Creates a RequirementUsage element in the specified project. Optionally nested under a parent package.")]
