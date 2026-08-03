@@ -38,6 +38,8 @@ builder.Services.AddSingleton(new SysMLMetaModelFactory(ResolveSchemasPath(build
 builder.Services.AddSingleton<ProjectContextResolver>();
 builder.Services.AddSingleton<SysMLPackageFactory>();
 builder.Services.AddSingleton<SysMLRequirementFactory>();
+builder.Services.AddSingleton<SysMLUseCaseFactory>();
+builder.Services.AddSingleton<ElementMutationService>();
 
 
 await builder.Build().RunAsync();
