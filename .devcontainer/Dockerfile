@@ -1,5 +1,10 @@
 FROM mcr.microsoft.com/devcontainers/dotnet:1-9.0-bookworm
 
+# Remove stale Yarn apt source shipped by the base image — its signing key
+# has rotated (NO_PUBKEY 62D54FD4003F6525) and we don't use Yarn anyway
+# (Node/TypeScript come via nvm + npm below).
+RUN rm -f /etc/apt/sources.list.d/yarn.list /etc/apt/sources.list.d/yarn.sources
+
 # Install PostgreSQL client tools and Java
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
