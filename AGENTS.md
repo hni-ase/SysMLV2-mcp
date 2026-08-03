@@ -345,5 +345,6 @@ flowchart LR
 ```
 
 Migration order per AGENTS.md §"Migration order":
-projects ✅ → schema → element query → packages → requirements →
-use cases → signals → blocks → interfaces → mutations.
+projects ✅ → schema ✅ → element query ✅ → packages ✅ →
+requirements (+ use cases) ✅ → structure (signals, blocks, interfaces) ✅.
+Generic mutations live in a shared `ElementMutationService`, not as tools.
