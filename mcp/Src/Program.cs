@@ -26,8 +26,6 @@ if (mode == "stdio")
 {
     mcpBuilder.WithStdioServerTransport();
 }
-// In http mode the McpServerOptions (with tools) is registered by AddMcpServer
-// but no transport is wired here; the /mcp endpoint below drives it per request.
 
 builder.Services.AddHttpClient(
     SYSML_DATABASE_CLIENT_NAME,
@@ -80,12 +78,11 @@ if (mode == "http")
         var server = McpServer.Create(transport, options, loggerFactory, sp);
         var runTask = Task.Run(() => server.RunAsync(context.RequestAborted));
 
-        context.Response.ContentType = "application/json";
-        context.Response.Headers["Mcp-Session-Id"] = transport.SessionId;
-
+        using var captureStream = new MemoryStream();
+        bool handled;
         try
         {
-            await transport.HandlePostRequest(request, context.Response.Body, context.RequestAborted);
+            handled = await transport.HandlePostRequest(request, captureStream, context.RequestAborted);
         }
         catch (Exception)
         {
@@ -93,6 +90,15 @@ if (mode == "http")
             await server.DisposeAsync();
             return;
         }
+
+        captureStream.Position = 0;
+        using var reader = new StreamReader(captureStream);
+        var sseContent = await reader.ReadToEndAsync();
+        var json = ExtractJsonFromSse(sseContent);
+
+        context.Response.ContentType = "application/json";
+        context.Response.Headers["Mcp-Session-Id"] = transport.SessionId;
+        await context.Response.WriteAsync(json);
 
         await transport.DisposeAsync();
         await server.DisposeAsync();
@@ -140,4 +146,17 @@ static string ParseMode(string[] args)
             return a["--mode=".Length..].ToLowerInvariant();
     }
     return "stdio";
+}
+
+static string ExtractJsonFromSse(string sseContent)
+{
+    foreach (var line in sseContent.Split('\n'))
+    {
+        var trimmed = line.Trim();
+        if (trimmed.StartsWith("data: ", StringComparison.Ordinal))
+            return trimmed["data: ".Length..];
+        if (trimmed.StartsWith("data:", StringComparison.Ordinal))
+            return trimmed["data:".Length..].TrimStart();
+    }
+    return sseContent;
 }
