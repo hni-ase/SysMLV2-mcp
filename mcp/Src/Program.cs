@@ -31,7 +31,7 @@ builder.Services.AddHttpClient(
     SYSML_DATABASE_CLIENT_NAME,
     client =>
     {
-        client.BaseAddress = new Uri(SYSML_DATABSE_SERVER_URL);
+        client.BaseAddress = new Uri(SYSML_DATABASE_SERVER_URL);
         client.DefaultRequestHeaders.UserAgent.ParseAdd("dotnet-docs");
     });
 builder.Services.AddSingleton<ISysMLApiService, SysMLApiService>();
