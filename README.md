@@ -132,7 +132,7 @@ Add a new record or class to `mcp/Src/Models/` for any structured data the tool 
 
 ### 5. Write tests
 
-Add a test class to `csharp-mcp-example-test/` following the existing `SysMLOpenApiFactoryTests.cs` pattern. Run the suite with:
+Add a test class to `test/SysMLv2Mcp.Tests/` following the existing `SysMLOpenApiFactoryTests.cs` pattern. Run the suite with:
 
 ```bash
 dotnet test

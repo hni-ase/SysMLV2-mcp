@@ -3,13 +3,13 @@ using System.Text.Json.Nodes;
 using mcp.Src.Services;
 using Xunit;
 
-namespace csharp_mcp_example_test;
+namespace SysMLv2Mcp.Tests;
 
 public class RecursiveSchemaPropertiesTest
 {
     private string GetSysMlSchemasPath()
     {
-        return Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
+        return Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
     }
 
     [Fact]

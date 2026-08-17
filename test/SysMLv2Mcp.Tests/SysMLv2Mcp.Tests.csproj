@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <RootNamespace>csharp_mcp_example_test</RootNamespace>
+    <RootNamespace>SysMLv2Mcp.Tests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -27,11 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../mcp/csharp-mcp-example.csproj" />
+    <ProjectReference Include="../../mcp/SysMLv2Mcp.Tools.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="../sysmlv2-api-spec/metamodels/*.json">
+    <Content Update="../../sysmlv2-api-spec/metamodels/*.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

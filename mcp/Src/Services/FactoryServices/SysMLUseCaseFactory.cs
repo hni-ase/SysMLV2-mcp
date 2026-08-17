@@ -22,7 +22,7 @@ public class SysMLUseCaseFactory
     /// <param name="objectiveRequirementId">Optional ID of a RequirementUsage to link as the objective.</param>
     /// <param name="ownerPackageGuid">Optional parent package to nest this use case under.</param>
     /// <returns>The element ID of the created UseCaseUsage, and the project ID.</returns>
-    public async Task<(Guid ElementId, Guid ProjectId)> CreateUseCase(
+    public virtual async Task<(Guid ElementId, Guid ProjectId)> CreateUseCase(
         Guid projectId,
         string useCaseName,
         Guid objectiveRequirementId = default,

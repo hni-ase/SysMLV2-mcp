@@ -3,13 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csharp-mcp-example", "mcp\csharp-mcp-example.csproj", "{506E4386-9C5A-9E72-6E94-1791E55FDA1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysMLv2Mcp.Tools", "mcp\SysMLv2Mcp.Tools.csproj", "{506E4386-9C5A-9E72-6E94-1791E55FDA1D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sysml-v2-client", "sysml-v2-client", "{480FAD32-0FFB-3AAC-594B-D92CC6600F4D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CBCDAB1D-8FCF-1513-A736-21603D502A29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csharp-mcp-example-test", "csharp-mcp-example-test\csharp-mcp-example-test.csproj", "{70343348-9B3F-46D8-A3FE-403598CBC76C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysMLv2Mcp.Tests", "test\SysMLv2Mcp.Tests\SysMLv2Mcp.Tests.csproj", "{70343348-9B3F-46D8-A3FE-403598CBC76C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosts", "Hosts", "{DE751759-197E-4BB3-A16F-40529A69F0B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysMLv2Mcp.Projects", "Hosts\Projects\SysMLv2Mcp.Projects.csproj", "{A974F3E8-BF1B-4412-B48F-44E93BD0261D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,12 +49,25 @@ Global
 		{70343348-9B3F-46D8-A3FE-403598CBC76C}.Release|x64.Build.0 = Release|Any CPU
 		{70343348-9B3F-46D8-A3FE-403598CBC76C}.Release|x86.ActiveCfg = Release|Any CPU
 		{70343348-9B3F-46D8-A3FE-403598CBC76C}.Release|x86.Build.0 = Release|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Debug|x64.Build.0 = Debug|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Debug|x86.Build.0 = Debug|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Release|x64.ActiveCfg = Release|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Release|x64.Build.0 = Release|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Release|x86.ActiveCfg = Release|Any CPU
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CBCDAB1D-8FCF-1513-A736-21603D502A29} = {480FAD32-0FFB-3AAC-594B-D92CC6600F4D}
+		{A974F3E8-BF1B-4412-B48F-44E93BD0261D} = {DE751759-197E-4BB3-A16F-40529A69F0B4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1980D23A-DBA5-4F35-87D4-D3596E8DF275}

@@ -3,12 +3,12 @@ using System.Text.Json.Nodes;
 using mcp.Src.Services;
 using Xunit;
 
-namespace csharp_mcp_example_test;
+namespace SysMLv2Mcp.Tests;
 
 public class SysMLOpenApiFactoryTests
 {
     private string GetSysMlSchemasPath() =>
-        Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
+        Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
 
     // ── Constructor ───────────────────────────────────────────────────────────
 

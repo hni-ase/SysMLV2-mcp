@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 using SysMLV2.MCP.Models;
 using Xunit;
 
-namespace csharp_mcp_example_test;
+namespace SysMLv2Mcp.Tests;
 
 /// <summary>
 /// Tests that <see cref="SysMLProject"/>, <see cref="SysMLElement"/> and

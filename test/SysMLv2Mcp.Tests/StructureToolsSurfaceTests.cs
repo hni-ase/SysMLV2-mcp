@@ -1,10 +1,11 @@
 using System.ComponentModel;
 using mcp.Src.Services;
 using SysMLV2.MCP.Models;
+using Tools.Structure;
 
-namespace csharp_mcp_example_test;
+namespace SysMLv2Mcp.Tests;
 
-public class ModelCreationToolsSurfaceTests
+public class StructureToolsSurfaceTests
 {
     [Theory]
     [InlineData("CreateSignalDefinition", typeof(ElementCreationResult))]
@@ -21,7 +22,7 @@ public class ModelCreationToolsSurfaceTests
     [InlineData("UpdateInterface", typeof(ElementUpdateResult))]
     public void ToolMethod_Exists_WithExpectedReturnType_AndAttributes(string methodName, Type expectedReturnType)
     {
-        var method = typeof(ModelCreationTools).GetMethod(methodName);
+        var method = typeof(StructureTools).GetMethod(methodName);
 
         Assert.NotNull(method);
         Assert.Equal(expectedReturnType, method!.ReturnType);
@@ -50,5 +51,5 @@ public class ModelCreationToolsSurfaceTests
     }
 
     private static string GetSysMlSchemasPath() =>
-        Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
+        Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "sysmlv2-api-spec", "metamodels");
 }

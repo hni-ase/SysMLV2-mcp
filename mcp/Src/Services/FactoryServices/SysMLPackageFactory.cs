@@ -24,7 +24,7 @@ public class SysMLPackageFactory
         return null;
     }
 
-    public async Task<Guid> CreatePackage(Guid projectId, string packageName, string shortName = "", Guid ownerPackageGuid = default)
+    public virtual async Task<Guid> CreatePackage(Guid projectId, string packageName, string shortName = "", Guid ownerPackageGuid = default)
     {
         var project = await _sysMLApiService.GetProjectAsync(projectId);
         var projectGuid = project.Id ?? throw new Exception("Project has no ID");
