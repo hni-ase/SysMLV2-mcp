@@ -10,7 +10,7 @@ using ModelContextProtocol.Server;
 using Src.Services;
 
 const string SYSML_DATABASE_CLIENT_NAME = "SysMLV2-Database-Client";
-const string SYSML_DATABSE_SERVER_URL = "http://localhost:9000";
+const string SYSML_DATABASE_SERVER_URL = "http://localhost:9000";
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.
