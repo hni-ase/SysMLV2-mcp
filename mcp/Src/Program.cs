@@ -10,7 +10,8 @@ using ModelContextProtocol.Server;
 using Src.Services;
 
 const string SYSML_DATABASE_CLIENT_NAME = "SysMLV2-Database-Client";
-const string SYSML_DATABASE_SERVER_URL = "http://localhost:9000";
+var sysmlBaseUrl = (Environment.GetEnvironmentVariable("SYSML_API_BASE_URL") ?? "http://localhost:9000").TrimEnd('/');
+var sysmlHttpHost = Environment.GetEnvironmentVariable("SYSML_HTTP_HOST");
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.
@@ -31,8 +32,12 @@ builder.Services.AddHttpClient(
     SYSML_DATABASE_CLIENT_NAME,
     client =>
     {
-        client.BaseAddress = new Uri(SYSML_DATABASE_SERVER_URL);
+        client.BaseAddress = new Uri(sysmlBaseUrl);
         client.DefaultRequestHeaders.UserAgent.ParseAdd("dotnet-docs");
+        if (!string.IsNullOrWhiteSpace(sysmlHttpHost))
+        {
+            client.DefaultRequestHeaders.Host = sysmlHttpHost.Trim();
+        }
     });
 builder.Services.AddSingleton<ISysMLApiService, SysMLApiService>();
 builder.Services.AddSingleton(new SysMLMetaModelFactory(ResolveSchemasPath(builder.Environment.ContentRootPath)));
@@ -47,6 +52,8 @@ var app = builder.Build();
 
 if (mode == "http")
 {
+    app.MapGet("/health", () => Results.Ok(new { status = "ok", mode = "http", sysml = sysmlBaseUrl }));
+
     const string McpEndpoint = "/mcp";
 
     app.MapPost(McpEndpoint, async (HttpContext context, IServiceProvider sp) =>
@@ -118,6 +125,10 @@ await app.RunAsync();
 
 static string ResolveSchemasPath(string contentRootPath)
 {
+    var envPath = Environment.GetEnvironmentVariable("SYSML_SCHEMAS_PATH");
+    if (!string.IsNullOrWhiteSpace(envPath) && Directory.Exists(envPath))
+        return Path.GetFullPath(envPath);
+
     var candidates = new[]
     {
         Path.Combine(contentRootPath, "..", "sysmlv2-api-spec", "metamodels"),
