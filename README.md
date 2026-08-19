@@ -2,6 +2,24 @@
 
 This repository contains a C# Model Context Protocol (MCP) server for working with SysML v2 models and related services.
 
+## Run with Docker
+
+```bash
+docker build -t sysmlv2-mcp .
+docker run --rm -p 5214:5214 \
+  -e SYSML_API_BASE_URL=http://host.docker.internal:9000 \
+  sysmlv2-mcp
+```
+
+Health check: `http://localhost:5214/health`
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `SYSML_API_BASE_URL` | `http://localhost:9000` | SysML v2 REST API base URL |
+| `SYSML_HTTP_HOST` | _(unset)_ | Optional Host header override |
+| `SYSML_SCHEMAS_PATH` | _(auto)_ | Path to metamodel schemas |
+| `ASPNETCORE_URLS` | `http://0.0.0.0:5214` | Bind address |
+
 ## Citation
 
 If you use this repository in your research or projects, please cite the following paper:
