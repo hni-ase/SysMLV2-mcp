@@ -16,7 +16,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/publish .
+COPY --from=build /src/sysmlv2-api-spec ./sysmlv2-api-spec
+
 ENV ASPNETCORE_URLS=http://0.0.0.0:5214
+ENV SYSML_SCHEMAS_PATH=/app/sysmlv2-api-spec/metamodels
 EXPOSE 5214
 
 ENTRYPOINT ["dotnet", "SysMLv2Mcp.Tools.dll", "--mode", "http"]
