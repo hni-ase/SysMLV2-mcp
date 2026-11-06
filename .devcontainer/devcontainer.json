@@ -40,7 +40,7 @@
 	// Remove the MSSQL-specific postCreateCommand
 	// "postCreateCommand": "bash .devcontainer/mssql/postCreateCommand.sh 'P@ssw0rd' './bin/Debug/' './.devcontainer/mssql/'",
 	"features": {
-		"ghcr.io/nikiforovall/devcontainer-features/dotnet-csharpier:1": {},
+		"ghcr.io/nikiforovall/devcontainer-features/dotnet-csharpier:2": {},
 		"ghcr.io/dotnet/aspire-devcontainer-feature/dotnetaspire:1": {}
 	}
 
